@@ -30,4 +30,12 @@ public class Restroom {
     public int getNumRatings() {
         return numRatings;
     }
+
+    public String getUID() {
+        return UID;
+    }
+
+    public String getName() {
+        return name;
+    }
 }
