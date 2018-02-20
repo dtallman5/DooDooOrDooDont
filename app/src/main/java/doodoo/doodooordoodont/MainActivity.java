@@ -19,6 +19,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MainActivity extends AppCompatActivity
@@ -168,8 +169,12 @@ public class MainActivity extends AppCompatActivity
         mMap = googleMap;
         mMap.setInfoWindowAdapter(new CustomInfoWindow(this));
 
+        Restroom rm = new Restroom("001", "Test Bathroom");
+
         LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney));
+        Marker m = mMap.addMarker(new MarkerOptions().position(sydney));
+        m.setTag(rm);
+
 
 
     }
