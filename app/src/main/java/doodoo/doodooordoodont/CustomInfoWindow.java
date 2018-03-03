@@ -49,6 +49,13 @@ public class CustomInfoWindow implements GoogleMap.InfoWindowAdapter {
 
         Restroom rm = (Restroom) marker.getTag();
 
+        if (rm.isMenDisplayed()){
+            host.setCurrentTab(0);
+        }
+        else{
+            host.setCurrentTab(1);
+        }
+
         return v;
     }
     @Override

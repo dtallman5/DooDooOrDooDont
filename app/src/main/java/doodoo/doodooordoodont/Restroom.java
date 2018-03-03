@@ -11,10 +11,12 @@ public class Restroom {
     private float avgRating;
     private int numRatings;
     private int numStalls;
+    private boolean menDisplayed;
 
     public Restroom(String UID, String name) {
         this.UID = UID;
         this.name = name;
+        menDisplayed = true;
     }
 
 
@@ -37,5 +39,13 @@ public class Restroom {
 
     public String getName() {
         return name;
+    }
+
+    public boolean isMenDisplayed() {
+        return menDisplayed;
+    }
+
+    public void setMenDisplayed(boolean menDisplayed) {
+        this.menDisplayed = menDisplayed;
     }
 }

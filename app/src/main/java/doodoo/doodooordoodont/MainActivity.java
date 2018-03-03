@@ -1,4 +1,5 @@
 package doodoo.doodooordoodont;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -26,6 +27,8 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
 
     private GoogleMap mMap;
+    private boolean menDisplayed;
+    private Context context;
 
     /**
      * onCreate:
@@ -39,6 +42,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        context = this;
 
         //Sets the content view and initializes the toolbar
         setContentView(R.layout.activity_main);
@@ -169,10 +174,27 @@ public class MainActivity extends AppCompatActivity
         mMap = googleMap;
         mMap.setInfoWindowAdapter(new CustomInfoWindow(this));
 
+        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                Restroom room = (Restroom) marker.getTag();
+                if (room.isMenDisplayed()){
+                    room.setMenDisplayed(false);
+                }
+                else{
+                    room.setMenDisplayed(true);
+                }
+                marker.setTag(room);
+                mMap.setInfoWindowAdapter(new CustomInfoWindow(context));
+                marker.showInfoWindow();
+            }
+        });
+
         Restroom rm = new Restroom("001", "Test Bathroom");
 
         LatLng sydney = new LatLng(-34, 151);
         Marker m = mMap.addMarker(new MarkerOptions().position(sydney));
+
         m.setTag(rm);
 
 
