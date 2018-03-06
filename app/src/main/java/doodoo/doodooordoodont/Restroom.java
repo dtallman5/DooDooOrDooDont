@@ -8,10 +8,14 @@ public class Restroom {
     private String UID;
     private String name;
 
-    private float avgRating;
-    private int numRatings;
-    private int numStalls;
-    private boolean menDisplayed;
+    private float mAvgRating;
+    private int mNumRatings;
+    private int mNumStalls;
+    private float fAvgRating;
+    private int fNumRatings;
+    private int fNumStalls;
+
+    public static boolean menDisplayed;
 
     public Restroom(String UID, String name) {
         this.UID = UID;
@@ -20,17 +24,27 @@ public class Restroom {
     }
 
 
-    public void setRatings(float avgRating, int numRatings) {
-        this.numRatings = numRatings;
-        this.avgRating = avgRating;
+    public void setRatings(float mAvgRating, int mNumRatings,float fAvgRating, int fNumRatings) {
+        this.fNumRatings = fNumRatings;
+        this.fAvgRating = fAvgRating;
+        this.mNumRatings = mNumRatings;
+        this.mAvgRating = mAvgRating;
     }
 
-    public float getAvgRating() {
-        return avgRating;
+    public float getmAvgRating() {
+        return mAvgRating;
     }
 
-    public int getNumRatings() {
-        return numRatings;
+    public int getmNumRatings() {
+        return mNumRatings;
+    }
+
+    public float getfAvgRating() {
+        return fAvgRating;
+    }
+
+    public int getfNumRatings() {
+        return fNumRatings;
     }
 
     public String getUID() {
@@ -41,11 +55,11 @@ public class Restroom {
         return name;
     }
 
-    public boolean isMenDisplayed() {
+    public static boolean isMenDisplayed() {
         return menDisplayed;
     }
 
-    public void setMenDisplayed(boolean menDisplayed) {
-        this.menDisplayed = menDisplayed;
+    public static void setMenDisplayed(boolean bool) {
+        menDisplayed = bool;
     }
 }
