@@ -33,21 +33,33 @@ public class CustomInfoWindow implements GoogleMap.InfoWindowAdapter {
         // res/layout folder. You can provide your own
         View v = inflater.inflate(R.layout.infowindow_layout, null);
 
+        Restroom rm = (Restroom) marker.getTag();
 
         TabHost host = (TabHost) v.findViewById(R.id.tab_host);
         host.setup();
 
         TabHost.TabSpec spec = host.newTabSpec("Male");
         spec.setContent(R.id.tab1);
+        TextView mAvg = (TextView) v.findViewById(R.id.maleAvg);
+        mAvg.setText(Float.toString(rm.getmAvgRating()));
+        TextView mNum = (TextView) v.findViewById(R.id.maleNum);
+        mNum.setText(Integer.toString(rm.getmNumRatings()));
+        TextView mName = (TextView) v.findViewById(R.id.maleName);
+        mName.setText(rm.getName());
         spec.setIndicator("Male");
         host.addTab(spec);
 
         spec = host.newTabSpec("Female");
         spec.setContent(R.id.tab2);
+        TextView fAvg = (TextView) v.findViewById(R.id.femaleAvg);
+        fAvg.setText(Float.toString(rm.getfAvgRating()));
+        TextView fNum = (TextView) v.findViewById(R.id.femaleNum);
+        fNum.setText(Integer.toString(rm.getfNumRatings()));
+        TextView fName = (TextView) v.findViewById(R.id.femaleName);
+        fName.setText(rm.getName());
         spec.setIndicator("Female");
         host.addTab(spec);
 
-        Restroom rm = (Restroom) marker.getTag();
 
         if (rm.isMenDisplayed()){
             host.setCurrentTab(0);

@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 //Google Maps Imports
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -190,7 +191,18 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+
+        mMap.setOnInfoWindowLongClickListener(new GoogleMap.OnInfoWindowLongClickListener() {
+            @Override
+            public void onInfoWindowLongClick(Marker marker) {
+                Toast toast = Toast.makeText(context, "Go to Restroom Page", Toast.LENGTH_LONG);
+                toast.show();
+            }
+        });
+
         Restroom rm = new Restroom("001", "Test Bathroom");
+        rm.setRatings(4.5f,100,2.1f,5);
+
 
         LatLng sydney = new LatLng(-34, 151);
         Marker m = mMap.addMarker(new MarkerOptions().position(sydney));
