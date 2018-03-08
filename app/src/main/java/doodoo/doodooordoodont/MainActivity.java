@@ -212,8 +212,13 @@ public class MainActivity extends AppCompatActivity
 
         LatLng sydney = new LatLng(-34, 151);
         Marker m = mMap.addMarker(new MarkerOptions().position(sydney));
-
         m.setTag(rm);
+
+        LatLng homePos = new LatLng(32.878695, -117.212936);
+        Marker m2 = mMap.addMarker(new MarkerOptions().position(homePos));
+        Restroom home = new Restroom("002","Apartment Bathroom");
+        home.setRatings(2.5f,4,2.5f,4);
+        m2.setTag(home);
 
 
     }
