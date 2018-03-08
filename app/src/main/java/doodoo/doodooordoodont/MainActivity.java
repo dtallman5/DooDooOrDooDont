@@ -1,8 +1,13 @@
 package doodoo.doodooordoodont;
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -31,9 +36,11 @@ public class MainActivity extends AppCompatActivity
     private boolean menDisplayed;
     private Context context;
 
+    public static final int REQUEST_LOCATION_PERMISSION = 99;
+
     /**
      * onCreate:
-     *
+     * <p>
      * This method is called every time the activity is created. It initializes all of the UI
      * and starts the Google Map.
      *
@@ -80,7 +87,7 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * onBackPressed:
-     *
+     * <p>
      * Called when the back button is pressed. If the drawer is open it closes it.
      */
     @Override
@@ -97,11 +104,10 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * onCreateOptionsMenu:
-     *
+     * <p>
      * This method is called when the options menu is created.
      *
      * @param menu The menu that is being created
-     *
      * @return A boolean based on whether the menu was successfully created.
      */
     @Override
@@ -128,7 +134,7 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * onNavigationItemSelected:
-     *
+     * <p>
      * This method is called when an item in the navigation drawer is selected. It then initiates
      * the appropriate response based on which item was selected.
      *
@@ -144,7 +150,7 @@ public class MainActivity extends AppCompatActivity
         //Checks which item was selected and handles the appropriate action
         if (id == R.id.nav_camera) {
 
-         } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {
 
@@ -164,7 +170,7 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * onMapReady:
-     *
+     * <p>
      * Called when the google map fragment is ready. Used to intialize markers and other factors
      * associated with the map fragment
      *
@@ -174,15 +180,15 @@ public class MainActivity extends AppCompatActivity
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setInfoWindowAdapter(new CustomInfoWindow(this));
+        enableMyLocation();
 
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
                 Restroom room = (Restroom) marker.getTag();
-                if (room.isMenDisplayed()){
+                if (room.isMenDisplayed()) {
                     room.setMenDisplayed(false);
-                }
-                else{
+                } else {
                     room.setMenDisplayed(true);
                 }
                 marker.setTag(room);
@@ -201,7 +207,7 @@ public class MainActivity extends AppCompatActivity
         });
 
         Restroom rm = new Restroom("001", "Test Bathroom");
-        rm.setRatings(4.5f,100,2.1f,5);
+        rm.setRatings(4.5f, 100, 2.1f, 5);
 
 
         LatLng sydney = new LatLng(-34, 151);
@@ -210,6 +216,35 @@ public class MainActivity extends AppCompatActivity
         m.setTag(rm);
 
 
-
     }
+
+    private void enableMyLocation() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            mMap.setMyLocationEnabled(true);
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]
+                            {Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQUEST_LOCATION_PERMISSION);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        // Check if location permissions are granted and if so enable the
+        // location data layer.
+        switch (requestCode) {
+            case REQUEST_LOCATION_PERMISSION:
+                if (grantResults.length > 0
+                        && grantResults[0]
+                        == PackageManager.PERMISSION_GRANTED) {
+                    enableMyLocation();
+                    break;
+                }
+        }
+    }
+
 }
