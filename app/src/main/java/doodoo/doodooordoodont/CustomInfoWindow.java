@@ -5,6 +5,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.RatingBar;
 import android.widget.TabHost;
 import android.widget.TextView;
 
@@ -40,8 +41,8 @@ public class CustomInfoWindow implements GoogleMap.InfoWindowAdapter {
 
         TabHost.TabSpec spec = host.newTabSpec("Male");
         spec.setContent(R.id.tab1);
-        TextView mAvg = (TextView) v.findViewById(R.id.maleAvg);
-        mAvg.setText(Float.toString(rm.getmAvgRating()));
+        RatingBar mAvg = (RatingBar) v.findViewById(R.id.maleAvg);
+        mAvg.setRating(rm.getmAvgRating());
         TextView mNum = (TextView) v.findViewById(R.id.maleNum);
         mNum.setText(Integer.toString(rm.getmNumRatings()));
         TextView mName = (TextView) v.findViewById(R.id.maleName);

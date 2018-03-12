@@ -4,8 +4,11 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 
 /**
@@ -25,9 +28,27 @@ public class AddRestroom extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         Spinner stallSpinner = (Spinner) findViewById(R.id.stallSpinner);
-        String[] items = {"0","1","2","3","4","5","6","7+"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,items);
-        stallSpinner.setAdapter(adapter);
+        String[] stallitems = {"0","1","2","3","4","5","6","7+"};
+        ArrayAdapter<String> stalladapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,stallitems);
+        stallSpinner.setAdapter(stalladapter);
+
+        Spinner dryerSpinner = (Spinner) findViewById(R.id.dryerSpinner);
+        String[] dryitems = {"Paper Towels","Air Dryers", "Both", "Other"};
+        ArrayAdapter<String> dryadapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,dryitems);
+        dryerSpinner.setAdapter(dryadapter);
+
+        TextView showMore = (TextView) findViewById(R.id.showMore);
+        final LinearLayout additionalInfo = (LinearLayout) findViewById(R.id.addtnInfo);
+        showMore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (additionalInfo.getVisibility() == View.GONE)
+                    additionalInfo.setVisibility(View.VISIBLE);
+                else if (additionalInfo.getVisibility() == View.VISIBLE)
+                    additionalInfo.setVisibility(View.GONE);
+            }
+        });
+
 
 
         this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);

@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity
         Intent nextScreen;
 
         //Checks which item was selected and handles the appropriate action
-        if (id == R.id.nav_camera) {
+        if (id == R.id.nav_add_restroom) {
             drawer.closeDrawer(GravityCompat.START);
             nextScreen = new Intent(this,AddRestroom.class);
             //nextScreen.putExtra("Lat", )

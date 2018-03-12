@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
-        app:theme="@style/ThemeOverlay.AppCompat.Dark"></android.support.v7.widget.Toolbar>
+        app:theme="@style/ThemeOverlay.AppCompat.Dark">
+    </android.support.v7.widget.Toolbar>
 
 
     <LinearLayout
@@ -47,42 +48,37 @@
             android:textColor="@android:color/black"
             android:textSize="18sp" />
 
-        <LinearLayout
+
+        <RadioGroup
+            android:id="@+id/genderGroup"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:orientation="horizontal">
 
-            <RadioGroup
-                android:id="@+id/genderGroup"
+            <RadioButton
+                android:id="@+id/maleButton"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="horizontal">
+                android:text="Male" />
 
-                <RadioButton
-                    android:id="@+id/maleButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Male" />
+            <RadioButton
+                android:id="@+id/femaleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Female" />
 
-                <RadioButton
-                    android:id="@+id/femaleButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Female" />
+            <RadioButton
+                android:id="@+id/bothButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Both" />
 
-                <RadioButton
-                    android:id="@+id/bothButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Both" />
+        </RadioGroup>
 
-            </RadioGroup>
-
-        </LinearLayout>
 
         <TextView
             android:id="@+id/textView8"
@@ -92,10 +88,19 @@
             android:background="@color/colorLightGray"
             android:paddingBottom="5dp"
             android:paddingTop="5dp"
-            android:text="Additional Information"
+            android:text="Optional Information"
             android:textAlignment="center"
             android:textColor="@android:color/black"
             android:textSize="24sp" />
+
+        <RatingBar
+            android:id="@+id/ratingBar"
+            style="@android:style/Widget.DeviceDefault.RatingBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:max="5"
+            android:stepSize="0.5"
+            android:layout_gravity="center_horizontal"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -107,7 +112,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="TextView" />
+                android:text="Number of Stalls" />
 
             <Spinner
                 android:id="@+id/stallSpinner"
@@ -116,6 +121,85 @@
 
             </Spinner>
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textView10"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Hand Dryers" />
+
+            <Spinner
+                android:id="@+id/dryerSpinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+            </Spinner>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/showMore"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:text="Additional Info"
+            android:textAlignment="center" />
+
+        <LinearLayout
+            android:id="@+id/addtnInfo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <CheckBox
+                android:id="@+id/checkBox2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:button="@null"
+                android:drawableRight="?android:attr/listChoiceIndicatorMultiple"
+                android:text="Customer Only" />
+
+            <CheckBox
+                android:id="@+id/checkBox3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:button="@null"
+                android:drawableRight="?android:attr/listChoiceIndicatorMultiple"
+                android:text="Handicap Accessible" />
+
+            <CheckBox
+                android:id="@+id/checkBox4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:button="@null"
+                android:drawableRight="?android:attr/listChoiceIndicatorMultiple"
+                android:text="Baby Changing Station" />
+
+            <CheckBox
+                android:id="@+id/checkBox5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:button="@null"
+                android:drawableRight="?android:attr/listChoiceIndicatorMultiple"
+                android:text="Personal Hygiene Dispenser" />
+
+            <CheckBox
+                android:id="@+id/checkBox6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:button="@null"
+                android:drawableRight="?android:attr/listChoiceIndicatorMultiple"
+                android:text="Automatic Toilets" />
+
+        </LinearLayout>
+
 
     </LinearLayout>
 
