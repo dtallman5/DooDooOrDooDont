@@ -1,14 +1,12 @@
 package doodoo.doodooordoodont;
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -20,11 +18,9 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 //Google Maps Imports
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -54,7 +50,7 @@ public class MainActivity extends AppCompatActivity
         context = this;
 
         //Sets the content view and initializes the toolbar
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.drawer_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -136,10 +132,16 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Gets the id of the item selected
         int id = item.getItemId();
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        Intent nextScreen;
 
         //Checks which item was selected and handles the appropriate action
         if (id == R.id.nav_camera) {
-
+            drawer.closeDrawer(GravityCompat.START);
+            nextScreen = new Intent(this,AddRestroom.class);
+            //nextScreen.putExtra("Lat", )
+            startActivity(nextScreen);
+            return true;
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {
@@ -153,7 +155,6 @@ public class MainActivity extends AppCompatActivity
         }
 
         //Closes the drawer
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
