@@ -1,8 +1,11 @@
 package doodoo.doodooordoodont;
+
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -18,19 +21,25 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 //Google Maps Imports
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
 
-    private GoogleMap mMap;
+    private static GoogleMap mMap;
     private boolean menDisplayed;
     private Context context;
+    private Location loc;
+    private FusedLocationProviderClient mFusedLocationClient;
+    Restroom toAdd;
 
     public static final int REQUEST_LOCATION_PERMISSION = 99;
 
@@ -46,6 +55,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Intent here = getIntent();
+        if (here.getParcelableExtra("Restroom") != null){
+            toAdd = here.getParcelableExtra("Restroom");
+        }
 
         context = this;
 
@@ -69,6 +83,8 @@ public class MainActivity extends AppCompatActivity
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
     }
 
     /**
@@ -127,20 +143,34 @@ public class MainActivity extends AppCompatActivity
      * @param item The item that was selected and initiated the method call.
      * @return A boolean based on whether the method executed successfully
      */
+    @SuppressLint("MissingPermission")
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Gets the id of the item selected
         int id = item.getItemId();
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        Intent nextScreen;
+        final Intent nextScreen;
 
         //Checks which item was selected and handles the appropriate action
         if (id == R.id.nav_add_restroom) {
             drawer.closeDrawer(GravityCompat.START);
             nextScreen = new Intent(this,AddRestroom.class);
-            //nextScreen.putExtra("Lat", )
-            startActivity(nextScreen);
+            mFusedLocationClient.getLastLocation()
+                      .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            // Got last known location. In some rare situations this can be null
+
+                            if (location != null) {
+                                nextScreen.putExtra("Lat",location.getLatitude() );
+                                nextScreen.putExtra("Lon",location.getLongitude());
+                                startActivity(nextScreen);
+                            }
+                        }
+                    });
+
+
             return true;
         } else if (id == R.id.nav_gallery) {
 
@@ -158,6 +188,7 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
 
     /**
      * onMapReady:
@@ -211,6 +242,11 @@ public class MainActivity extends AppCompatActivity
         home.setRatings(2.5f,4,2.5f,4);
         m2.setTag(home);
 
+        if (toAdd != null){
+            LatLng toAddPos = new LatLng(toAdd.getLat(), toAdd.getLon());
+            Marker m3 = mMap.addMarker(new MarkerOptions().position(toAddPos));
+            m3.setTag(toAdd);
+        }
 
     }
 
@@ -243,4 +279,8 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public static void addMarker(Restroom toAdd) {
+        Marker m = mMap.addMarker(new MarkerOptions().position(new LatLng(toAdd.getLat(),toAdd.getLon())));
+        m.setTag(toAdd);
+    }
 }
