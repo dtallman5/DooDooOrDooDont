@@ -12,8 +12,18 @@
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
         app:theme="@style/ThemeOverlay.AppCompat.Dark">
-    </android.support.v7.widget.Toolbar>
 
+        <Button
+            android:id="@+id/sendButton"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:text="Send" />
+
+
+    </android.support.v7.widget.Toolbar>
+`
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -81,6 +91,12 @@
 
 
         <TextView
+            android:id="@+id/coordinateText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TextView" />
+
+        <TextView
             android:id="@+id/textView8"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -97,10 +113,10 @@
             android:id="@+id/ratingBar"
             style="@android:style/Widget.DeviceDefault.RatingBar"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="75dp"
+            android:layout_gravity="center_horizontal"
             android:max="5"
-            android:stepSize="0.5"
-            android:layout_gravity="center_horizontal"/>
+            android:stepSize="0.5" />
 
         <LinearLayout
             android:layout_width="match_parent"
