@@ -8,9 +8,9 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -18,30 +18,33 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
-//Google Maps Imports
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
-public class MainActivity extends AppCompatActivity
+//Google Maps Imports
+
+public class RestroomPage extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
 
     private static GoogleMap mMap;
     private boolean menDisplayed;
     private Context context;
     private Location loc;
-    private FusedLocationProviderClient mFusedLocationClient;
-    Restroom toAdd;
+    Restroom restroom;
 
-    public static final int REQUEST_LOCATION_PERMISSION = 99;
+    private FusedLocationProviderClient mFusedLocationClient;
 
     /**
      * onCreate:
@@ -56,15 +59,14 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Intent here = getIntent();
-        if (here.getParcelableExtra("Restroom") != null){
-            toAdd = here.getParcelableExtra("Restroom");
-        }
-
         context = this;
 
+        Intent from = getIntent();
+        restroom = from.getParcelableExtra("Restroom");
+
+
         //Sets the content view and initializes the toolbar
-        setContentView(R.layout.drawer_main);
+        setContentView(R.layout.drawer_restroom);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -85,6 +87,9 @@ public class MainActivity extends AppCompatActivity
         mapFragment.getMapAsync(this);
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        TextView title = findViewById(R.id.restroomName);
+        title.setText(restroom.getName());
     }
 
     /**
@@ -202,7 +207,6 @@ public class MainActivity extends AppCompatActivity
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setInfoWindowAdapter(new CustomInfoWindow(this));
-        enableMyLocation();
 
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
@@ -223,72 +227,14 @@ public class MainActivity extends AppCompatActivity
         mMap.setOnInfoWindowLongClickListener(new GoogleMap.OnInfoWindowLongClickListener() {
             @Override
             public void onInfoWindowLongClick(Marker marker) {
-                Restroom rm = (Restroom) marker.getTag();
-                System.out.println(rm.getLat());
-                System.out.println(rm.getLon());
-                Intent restroomPage = new Intent(context, RestroomPage.class);
-                restroomPage.putExtra("Restroom", rm);
-                startActivity(restroomPage);
-
                 Toast toast = Toast.makeText(context, "Go to Restroom Page", Toast.LENGTH_LONG);
                 toast.show();
             }
         });
 
-        Restroom rm = new Restroom("001", "Test Bathroom");
-        rm.setRatings(4.5f, 100, 2.1f, 5);
+        LatLng restroomPos = new LatLng(restroom.getLat(), restroom.getLon());
+        mMap.addMarker(new MarkerOptions().position(restroomPos));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(restroomPos, 17f));
 
-
-        LatLng sydney = new LatLng(-34, 151);
-        Marker m = mMap.addMarker(new MarkerOptions().position(sydney));
-        m.setTag(rm);
-
-        LatLng homePos = new LatLng(32.878695, -117.212936);
-        Marker m2 = mMap.addMarker(new MarkerOptions().position(homePos));
-        Restroom home = new Restroom("002","Apartment Bathroom");
-        home.setRatings(2.5f,4,2.5f,4);
-        home.setLocation(homePos.latitude, homePos.longitude);
-        m2.setTag(home);
-
-        if (toAdd != null){
-            LatLng toAddPos = new LatLng(toAdd.getLat(), toAdd.getLon());
-            Marker m3 = mMap.addMarker(new MarkerOptions().position(toAddPos));
-            m3.setTag(toAdd);
-        }
-
-    }
-
-    private void enableMyLocation() {
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            mMap.setMyLocationEnabled(true);
-        } else {
-            ActivityCompat.requestPermissions(this, new String[]
-                            {Manifest.permission.ACCESS_FINE_LOCATION},
-                    REQUEST_LOCATION_PERMISSION);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        // Check if location permissions are granted and if so enable the
-        // location data layer.
-        switch (requestCode) {
-            case REQUEST_LOCATION_PERMISSION:
-                if (grantResults.length > 0
-                        && grantResults[0]
-                        == PackageManager.PERMISSION_GRANTED) {
-                    enableMyLocation();
-                    break;
-                }
-        }
-    }
-
-    public static void addMarker(Restroom toAdd) {
-        Marker m = mMap.addMarker(new MarkerOptions().position(new LatLng(toAdd.getLat(),toAdd.getLon())));
-        m.setTag(toAdd);
     }
 }

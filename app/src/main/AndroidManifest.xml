@@ -27,6 +27,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".AddRestroom"/>
+        <activity android:name=".RestroomPage"/>
     </application>
 
 </manifest>
