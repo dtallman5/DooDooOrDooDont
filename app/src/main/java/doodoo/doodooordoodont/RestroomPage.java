@@ -1,23 +1,25 @@
 package doodoo.doodooordoodont;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,7 +30,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -64,11 +65,14 @@ public class RestroomPage extends AppCompatActivity
         Intent from = getIntent();
         restroom = from.getParcelableExtra("Restroom");
 
-
         //Sets the content view and initializes the toolbar
         setContentView(R.layout.drawer_restroom);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+        ImagePagerAdapter adapter = new ImagePagerAdapter(this);
+        viewPager.setAdapter(adapter);
 
         //Initializes the drawer layout and its toggle
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -236,5 +240,66 @@ public class RestroomPage extends AppCompatActivity
         mMap.addMarker(new MarkerOptions().position(restroomPos));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(restroomPos, 17f));
 
+    }
+
+    private class ImagePagerAdapter extends PagerAdapter {
+
+        Context mContext;
+        LayoutInflater mLayoutInflater;
+
+        public ImagePagerAdapter(Context context){
+            mContext = context;
+            mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        }
+
+        private int[] mImages = new int[] {
+                R.drawable.circleroom,
+                R.drawable.cityview,
+                R.drawable.golden,
+                R.drawable.makeuproom,
+                R.drawable.silverroom
+        };
+
+        @Override
+        public int getCount() {
+            return mImages.length;
+        }
+
+        @Override
+        public boolean isViewFromObject(View view, Object object) {
+            return view == ((LinearLayout) object);
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            /*Context context = RestroomPage.this;
+            ImageView imageView = new ImageView(context);
+            int padding = context.getResources().getDimensionPixelSize(
+                    R.dimen.padding_small);
+            imageView.setPadding(padding, padding, padding, padding);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+            imageView.setLayoutParams(lp);
+            imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            imageView.setAdjustViewBounds(true);
+            imageView.setImageResource(mImages[position]);
+            ((ViewPager) container).addView(imageView, 0);
+
+            return imageView;*/
+
+            View itemView = mLayoutInflater.inflate(R.layout.pager_item, container, false);
+
+            ImageView imageView = (ImageView) itemView.findViewById(R.id.imageView);
+            imageView.setImageResource(mImages[position]);
+
+            container.addView(itemView);
+
+            return itemView;
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            //((ViewPager) container).removeView((ImageView) object);
+            container.removeView((LinearLayout) object);
+        }
     }
 }

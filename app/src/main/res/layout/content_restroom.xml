@@ -10,6 +10,13 @@
     tools:context="doodoo.doodooordoodont.MainActivity"
     tools:showIn="@layout/toolbar">
 
+    <android.support.v4.view.ViewPager
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="200dp">
+
+    </android.support.v4.view.ViewPager>
+
     <TextView
         android:id="@+id/restroomName"
         android:layout_width="match_parent"
