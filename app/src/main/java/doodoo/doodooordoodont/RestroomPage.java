@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -73,6 +74,12 @@ public class RestroomPage extends AppCompatActivity
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         ImagePagerAdapter adapter = new ImagePagerAdapter(this);
         viewPager.setAdapter(adapter);
+
+        RatingBar ratingBar = (RatingBar) findViewById(R.id.bathroomRating);
+        ratingBar.setRating(restroom.getmAvgRating());
+
+        TextView numRatings = (TextView) findViewById(R.id.numReviews);
+        numRatings.setText(Integer.toString(restroom.getmNumRatings()) + " Reviews");
 
         //Initializes the drawer layout and its toggle
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
