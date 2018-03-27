@@ -224,23 +224,18 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onInfoWindowLongClick(Marker marker) {
                 Restroom rm = (Restroom) marker.getTag();
-                System.out.println(rm.getLat());
-                System.out.println(rm.getLon());
                 Intent restroomPage = new Intent(context, RestroomPage.class);
                 restroomPage.putExtra("Restroom", rm);
                 startActivity(restroomPage);
-
-                Toast toast = Toast.makeText(context, "Go to Restroom Page", Toast.LENGTH_LONG);
-                toast.show();
             }
         });
 
-        Restroom rm = new Restroom("001", "Test Bathroom");
-        rm.setRatings(4.5f, 100, 2.1f, 5);
-
 
         LatLng sydney = new LatLng(-34, 151);
+        Restroom rm = new Restroom("001", "Test Bathroom");
+        rm.setRatings(4.5f, 100, 2.1f, 5);
         Marker m = mMap.addMarker(new MarkerOptions().position(sydney));
+        rm.setLocation(sydney.latitude,sydney.longitude);
         m.setTag(rm);
 
         LatLng homePos = new LatLng(32.878695, -117.212936);

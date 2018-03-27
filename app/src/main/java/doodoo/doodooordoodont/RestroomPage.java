@@ -70,10 +70,31 @@ public class RestroomPage extends AppCompatActivity
         setContentView(R.layout.drawer_restroom);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle(restroom.getName());
 
-        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+        final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         ImagePagerAdapter adapter = new ImagePagerAdapter(this);
         viewPager.setAdapter(adapter);
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                TextView indicator = (TextView) findViewById(R.id.pagerIndicator);
+                indicator.setText(((position+1)+ " of " + viewPager.getAdapter().getCount()));
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+        TextView indicator = (TextView) findViewById(R.id.pagerIndicator);
+        indicator.setText("1 of " + viewPager.getAdapter().getCount());
 
         RatingBar ratingBar = (RatingBar) findViewById(R.id.bathroomRating);
         ratingBar.setRating(restroom.getmAvgRating());
@@ -259,6 +280,8 @@ public class RestroomPage extends AppCompatActivity
             mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
 
+
+
         private int[] mImages = new int[] {
                 R.drawable.circleroom,
                 R.drawable.cityview,
@@ -266,6 +289,7 @@ public class RestroomPage extends AppCompatActivity
                 R.drawable.makeuproom,
                 R.drawable.silverroom
         };
+
 
         @Override
         public int getCount() {
@@ -279,25 +303,10 @@ public class RestroomPage extends AppCompatActivity
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-            /*Context context = RestroomPage.this;
-            ImageView imageView = new ImageView(context);
-            int padding = context.getResources().getDimensionPixelSize(
-                    R.dimen.padding_small);
-            imageView.setPadding(padding, padding, padding, padding);
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
-            imageView.setLayoutParams(lp);
-            imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-            imageView.setAdjustViewBounds(true);
-            imageView.setImageResource(mImages[position]);
-            ((ViewPager) container).addView(imageView, 0);
-
-            return imageView;*/
-
             View itemView = mLayoutInflater.inflate(R.layout.pager_item, container, false);
 
             ImageView imageView = (ImageView) itemView.findViewById(R.id.imageView);
             imageView.setImageResource(mImages[position]);
-
             container.addView(itemView);
 
             return itemView;

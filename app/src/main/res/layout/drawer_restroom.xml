@@ -4,25 +4,146 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/colorLightGray">
 
-    <LinearLayout
+
+    <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <include
-            layout="@layout/toolbar"
+        <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="200dp"
+            android:id="@+id/restroomToolbar">
 
-        <include layout="@layout/content_restroom"
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"/>
+            <android.support.design.widget.CollapsingToolbarLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                app:expandedTitleGravity="top"
+                app:expandedTitleTextAppearance="@style/invisible"
+                app:collapsedTitleTextAppearance="@style/toolbar"
+                app:contentScrim="?attr/colorPrimary">
 
-    </LinearLayout>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_collapseMode="parallax">
+
+                    <android.support.v4.view.ViewPager
+                        android:id="@+id/pager"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                    </android.support.v4.view.ViewPager>
+
+                    <TextView
+                        android:id="@+id/pagerIndicator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginBottom="@dimen/padding_large"
+                        android:layout_alignBottom="@+id/pager"
+                        android:background="@color/colorLightGray"
+                        android:textColor="@color/colorBlack"
+                        android:padding="@dimen/padding_small"
+                        android:alpha="0.8"
+                        />
+
+                </RelativeLayout>
+
+                <android.support.v7.widget.Toolbar
+                    xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/toolbar"
+                    app:layout_collapseMode="pin"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    app:theme="@style/ThemeOverlay.AppCompat.Dark" />
 
 
+            </android.support.design.widget.CollapsingToolbarLayout>
+
+        </android.support.design.widget.AppBarLayout>
+
+
+        <android.support.v4.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:background="@color/colorWhite">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/restroomName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:textColor="@android:color/black"
+                    android:textSize="18sp" />
+
+
+                <RatingBar
+                    android:id="@+id/bathroomRating"
+                    style = "@style/RatingBarSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/restroomName"
+                    android:layout_alignParentStart="true"
+                    android:isIndicator="true"
+                    android:numStars="5"
+                    android:stepSize="0.1" />
+
+
+                <TextView
+                    android:id="@+id/numReviews"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="start"
+                    android:paddingTop="@dimen/padding_small"
+                    android:paddingStart="@dimen/padding_medium"
+                    android:layout_below="@id/restroomName"
+                    android:layout_toEndOf="@id/bathroomRating" />
+
+                <TextView
+                    android:id="@+id/bathroomType"
+                    android:layout_below="@id/bathroomRating"
+                    android:layout_alignParentStart="true"
+                    android:textColor="@color/colorBlack"
+                    android:layout_gravity="start"
+                    android:paddingBottom="@dimen/padding_medium"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Private Restroom"/>
+
+
+                <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:map="http://schemas.android.com/apk/res-auto"
+                    xmlns:tools="http://schemas.android.com/tools"
+                    android:id="@+id/map"
+                    android:name="com.google.android.gms.maps.SupportMapFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    tools:context="com.example.david.myapplication.MainActivity"
+                    android:layout_below="@id/bathroomType"
+                    android:layout_alignParentStart="true"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/map"
+                    android:textSize="144dp"
+                    android:text="Test. Add more info here"
+                    android:alpha="0.5"/>
+            </RelativeLayout>
+        </android.support.v4.widget.NestedScrollView>
+
+
+    </android.support.design.widget.CoordinatorLayout>
 
     <android.support.design.widget.NavigationView
         android:id="@+id/nav_view"

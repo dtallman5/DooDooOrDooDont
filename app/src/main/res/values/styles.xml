@@ -13,8 +13,22 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="invisible">
+        <item name="android:textColor">@color/invisible</item>
+    </style>
+
+    <style name="toolbar">
+        <item name="android:textColor">@color/colorWhite</item>
+        <item name="android:alpha">1</item>
+    </style>
+
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="RatingBarSmall" parent="Base.Widget.AppCompat.RatingBar.Small">
+        <item name="android:minHeight">25dip</item>
+        <item name="android:maxHeight">25dip</item>
+    </style>
 
 </resources>
