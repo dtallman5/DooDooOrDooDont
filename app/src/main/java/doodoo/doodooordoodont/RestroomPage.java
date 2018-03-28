@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.PagerAdapter;
@@ -31,9 +32,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
@@ -42,10 +41,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 public class RestroomPage extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
 
-    private static GoogleMap mMap;
-    private boolean menDisplayed;
     private Context context;
-    private Location loc;
     Restroom restroom;
 
     private FusedLocationProviderClient mFusedLocationClient;
@@ -63,18 +59,22 @@ public class RestroomPage extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        //Saves the context for later usage
         context = this;
 
+        //Gets the restroom that was associated with the marker whose info window was clicked.
         Intent from = getIntent();
         restroom = from.getParcelableExtra("Restroom");
 
         //Sets the content view and initializes the toolbar
         setContentView(R.layout.drawer_restroom);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(restroom.getName());
 
-        final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+        //Initializes the viewPager and sets the adapter to the custom class below and adds an
+        //onPageChange listener so the indicator text can be updated.
+        final ViewPager viewPager =  findViewById(R.id.pager);
         ImagePagerAdapter adapter = new ImagePagerAdapter(this);
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -85,7 +85,7 @@ public class RestroomPage extends AppCompatActivity
 
             @Override
             public void onPageSelected(int position) {
-                TextView indicator = (TextView) findViewById(R.id.pagerIndicator);
+                TextView indicator = findViewById(R.id.pagerIndicator);
                 indicator.setText(((position+1)+ " of " + viewPager.getAdapter().getCount()));
             }
 
@@ -95,24 +95,29 @@ public class RestroomPage extends AppCompatActivity
             }
         });
 
-        TextView indicator = (TextView) findViewById(R.id.pagerIndicator);
-        indicator.setText("1 of " + viewPager.getAdapter().getCount());
+        //Indicator Textview that displays x of y on the photos
+        TextView indicator = findViewById(R.id.pagerIndicator);
+        String initText = "1 of " + viewPager.getAdapter().getCount();
+        indicator.setText(initText);
 
-        RatingBar ratingBar = (RatingBar) findViewById(R.id.bathroomRating);
+        //Sets the rating for the Rating bar
+        RatingBar ratingBar = findViewById(R.id.bathroomRating);
         ratingBar.setRating(restroom.getmAvgRating());
 
-        TextView numRatings = (TextView) findViewById(R.id.numReviews);
-        numRatings.setText(Integer.toString(restroom.getmNumRatings()) + " Reviews");
+        // Sets the text for the number of ratings label
+        TextView numRatings = findViewById(R.id.numReviews);
+        String reviewsLabel = Integer.toString(restroom.getmNumRatings()) + " Reviews";
+        numRatings.setText(reviewsLabel);
 
         //Initializes the drawer layout and its toggle
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         //Initializes the view at the top of the drawer
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         //Initializes the google map fragment
@@ -122,6 +127,7 @@ public class RestroomPage extends AppCompatActivity
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
+        //Sets the title of the restroom
         TextView title = findViewById(R.id.restroomName);
         title.setText(restroom.getName());
     }
@@ -133,7 +139,7 @@ public class RestroomPage extends AppCompatActivity
      */
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
 
         //Checks whether the drawer is open and closes it if it is
         if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -158,6 +164,16 @@ public class RestroomPage extends AppCompatActivity
         return true;
     }
 
+    /**
+     * onOptionsItemSelected
+     *
+     * This method is used to handle the action bar item clicks, namely the ... button. I have left
+     * this in for now so that adding this feature will be very easy right now. Currently does
+     * nothing.
+     *
+     * @param item The item that was selected
+     * @return Returns the result of the superclasses method call
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -185,10 +201,10 @@ public class RestroomPage extends AppCompatActivity
     @SuppressLint("MissingPermission")
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Gets the id of the item selected
         int id = item.getItemId();
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         final Intent nextScreen;
 
         //Checks which item was selected and handles the appropriate action
@@ -240,10 +256,16 @@ public class RestroomPage extends AppCompatActivity
     @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-        mMap.setInfoWindowAdapter(new CustomInfoWindow(this));
-        mMap.getUiSettings().setMapToolbarEnabled(false);
-        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+        //Disables the map toolbar
+        googleMap.getUiSettings().setMapToolbarEnabled(false);
+
+        // Adds my location but removes the my location button. Effectively together displays the
+        //blue dot indicating the user's location
+        googleMap.setMyLocationEnabled(true);
+        googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+
+        //Changes the onMapClick behavior so it no longer opens straight to google maps app
+        googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
                 Toast toast = Toast.makeText(context,"Open Just Map Page!",Toast.LENGTH_LONG);
@@ -251,50 +273,31 @@ public class RestroomPage extends AppCompatActivity
             }
         });
 
-        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-            @Override
-            public void onInfoWindowClick(Marker marker) {
-                Restroom room = (Restroom) marker.getTag();
-                if (room.isMenDisplayed()) {
-                    room.setMenDisplayed(false);
-                } else {
-                    room.setMenDisplayed(true);
-                }
-                marker.setTag(room);
-                mMap.setInfoWindowAdapter(new CustomInfoWindow(context));
-                marker.showInfoWindow();
-            }
-        });
-
-
-        mMap.setOnInfoWindowLongClickListener(new GoogleMap.OnInfoWindowLongClickListener() {
-            @Override
-            public void onInfoWindowLongClick(Marker marker) {
-                Toast toast = Toast.makeText(context, "Go to Restroom Page", Toast.LENGTH_LONG);
-                toast.show();
-            }
-        });
-
+        //Adds the marker for the restroom
         LatLng restroomPos = new LatLng(restroom.getLat(), restroom.getLon());
-        mMap.addMarker(new MarkerOptions().position(restroomPos));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(restroomPos, 17f));
-        mMap.setMyLocationEnabled(true);
-        mMap.getUiSettings().setMyLocationButtonEnabled(false);
+        googleMap.addMarker(new MarkerOptions().position(restroomPos));
+
+        //Moves the camera to the restroom's position and zooms in
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(restroomPos, 17f));
+
 
     }
 
+    /**
+     * This is the custom PagerAdapter that is the brains behind the viewPager.
+     */
     private class ImagePagerAdapter extends PagerAdapter {
 
         Context mContext;
         LayoutInflater mLayoutInflater;
 
-        public ImagePagerAdapter(Context context){
+        ImagePagerAdapter(Context context){
             mContext = context;
             mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
 
 
-
+        //TODO: Remove hardcoded images and get images from database
         private int[] mImages = new int[] {
                 R.drawable.circleroom,
                 R.drawable.cityview,
@@ -311,14 +314,14 @@ public class RestroomPage extends AppCompatActivity
 
         @Override
         public boolean isViewFromObject(View view, Object object) {
-            return view == ((LinearLayout) object);
+            return view == object;
         }
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
             View itemView = mLayoutInflater.inflate(R.layout.pager_item, container, false);
 
-            ImageView imageView = (ImageView) itemView.findViewById(R.id.imageView);
+            ImageView imageView = itemView.findViewById(R.id.imageView);
             imageView.setImageResource(mImages[position]);
             container.addView(itemView);
 
@@ -327,7 +330,6 @@ public class RestroomPage extends AppCompatActivity
 
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
-            //((ViewPager) container).removeView((ImageView) object);
             container.removeView((LinearLayout) object);
         }
     }

@@ -18,7 +18,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 //Google Maps Imports
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -35,13 +34,11 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
 
     private static GoogleMap mMap;
-    private boolean menDisplayed;
     private Context context;
-    private Location loc;
     private FusedLocationProviderClient mFusedLocationClient;
-    Restroom toAdd;
+    private Restroom toAdd;
 
-    public static final int REQUEST_LOCATION_PERMISSION = 99;
+    private static final int REQUEST_LOCATION_PERMISSION = 99;
 
     /**
      * onCreate:
@@ -50,33 +47,35 @@ public class MainActivity extends AppCompatActivity
      * and starts the Google Map.
      *
      * @param savedInstanceState Holds data from previously saved states if it is not the first
-     *                           time the activity has been created. Null of first creation.
+     *                           time the activity has been created. Null on first creation.
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        //Temporary!!
+        //Used when testing the Add Restroom feature, Gets the restroom object from the Add Page
         Intent here = getIntent();
         if (here.getParcelableExtra("Restroom") != null){
             toAdd = here.getParcelableExtra("Restroom");
         }
 
-        context = this;
+        context = this; //Saves the context so that it can be used in internal classes.
 
         //Sets the content view and initializes the toolbar
         setContentView(R.layout.drawer_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         //Initializes the drawer layout and its toggle
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         //Initializes the view at the top of the drawer
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         //Initializes the google map fragment
@@ -94,7 +93,7 @@ public class MainActivity extends AppCompatActivity
      */
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
 
         //Checks whether the drawer is open and closes it if it is
         if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -119,6 +118,16 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    /**
+     * onOptionsItemSelected
+     *
+     * This method is used to handle the action bar item clicks, namely the ... button. I have left
+     * this in for now so that adding this feature will be very easy right now. Currently does
+     * nothing.
+     *
+     * @param item The item that was selected
+     * @return Returns the result of the superclasses method call
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -146,10 +155,10 @@ public class MainActivity extends AppCompatActivity
     @SuppressLint("MissingPermission")
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Gets the id of the item selected
         int id = item.getItemId();
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         final Intent nextScreen;
 
         //Checks which item was selected and handles the appropriate action
@@ -193,7 +202,7 @@ public class MainActivity extends AppCompatActivity
     /**
      * onMapReady:
      * <p>
-     * Called when the google map fragment is ready. Used to intialize markers and other factors
+     * Called when the google map fragment is ready. Used to initialize markers and other factors
      * associated with the map fragment
      *
      * @param googleMap The map that is ready
@@ -201,25 +210,23 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        mMap.setInfoWindowAdapter(new CustomInfoWindow(this));
         enableMyLocation();
 
+        mMap.setInfoWindowAdapter(new CustomInfoWindow(this));
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
                 Restroom room = (Restroom) marker.getTag();
-                if (room.isMenDisplayed()) {
-                    room.setMenDisplayed(false);
+                if (Restroom.isMenDisplayed()) {
+                    Restroom.setMenDisplayed(false);
                 } else {
-                    room.setMenDisplayed(true);
+                    Restroom.setMenDisplayed(true);
                 }
                 marker.setTag(room);
                 mMap.setInfoWindowAdapter(new CustomInfoWindow(context));
                 marker.showInfoWindow();
             }
         });
-
-
         mMap.setOnInfoWindowLongClickListener(new GoogleMap.OnInfoWindowLongClickListener() {
             @Override
             public void onInfoWindowLongClick(Marker marker) {
@@ -231,6 +238,9 @@ public class MainActivity extends AppCompatActivity
         });
 
 
+        /* **************************************************************** *
+         * Temporary Hard-coded restrooms and markers for testing purposes  *
+         * **************************************************************** */
         LatLng sydney = new LatLng(-34, 151);
         Restroom rm = new Restroom("001", "Test Bathroom");
         rm.setRatings(4.5f, 100, 2.1f, 5);
@@ -245,6 +255,9 @@ public class MainActivity extends AppCompatActivity
         home.setLocation(homePos.latitude, homePos.longitude);
         m2.setTag(home);
 
+
+        //If there is a restroom to add, it makes a marker for it. Once again only for testing
+        //purposes
         if (toAdd != null){
             LatLng toAddPos = new LatLng(toAdd.getLat(), toAdd.getLon());
             Marker m3 = mMap.addMarker(new MarkerOptions().position(toAddPos));
@@ -253,6 +266,13 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    /**
+     * enableMyLocation
+     *
+     * This method is used in order to enable the users location on the main map.
+     * It checks to make sure that the app has the correct permissions and if not it requests
+     * those permissions.
+     */
     private void enableMyLocation() {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
@@ -266,6 +286,16 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * onRequestPermissionsResult
+     *
+     * This overridden method checks to see if the permissions request went through and if it did
+     * then it calls enableMyLocation again so that it can enable myLocation on the map.
+     *
+     * @param requestCode The code of the request that was made
+     * @param permissions Which permissions were requested
+     * @param grantResults The results of the permission requests
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
@@ -283,8 +313,4 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public static void addMarker(Restroom toAdd) {
-        Marker m = mMap.addMarker(new MarkerOptions().position(new LatLng(toAdd.getLat(),toAdd.getLon())));
-        m.setTag(toAdd);
-    }
 }
