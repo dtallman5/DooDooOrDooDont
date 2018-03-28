@@ -130,7 +130,8 @@
                     android:layout_height="200dp"
                     tools:context="com.example.david.myapplication.MainActivity"
                     android:layout_below="@id/bathroomType"
-                    android:layout_alignParentStart="true"/>
+                    android:layout_alignParentStart="true"
+                    map:liteMode="true"/>
 
                 <TextView
                     android:layout_width="match_parent"

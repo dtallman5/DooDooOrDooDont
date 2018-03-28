@@ -24,18 +24,20 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+//Google Maps Imports
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
-//Google Maps Imports
+
 
 public class RestroomPage extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
@@ -235,10 +237,19 @@ public class RestroomPage extends AppCompatActivity
      *
      * @param googleMap The map that is ready
      */
+    @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setInfoWindowAdapter(new CustomInfoWindow(this));
+        mMap.getUiSettings().setMapToolbarEnabled(false);
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                Toast toast = Toast.makeText(context,"Open Just Map Page!",Toast.LENGTH_LONG);
+                toast.show();
+            }
+        });
 
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
@@ -267,6 +278,8 @@ public class RestroomPage extends AppCompatActivity
         LatLng restroomPos = new LatLng(restroom.getLat(), restroom.getLon());
         mMap.addMarker(new MarkerOptions().position(restroomPos));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(restroomPos, 17f));
+        mMap.setMyLocationEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(false);
 
     }
 
