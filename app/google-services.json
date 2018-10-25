@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "782707882508",
+    "firebase_url": "https://robotic-circle-194917.firebaseio.com",
+    "project_id": "robotic-circle-194917",
+    "storage_bucket": "robotic-circle-194917.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:782707882508:android:345b323d41b3809c",
+        "android_client_info": {
+          "package_name": "doodoo.doodooordoodont"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "782707882508-4nc46oeb3itb1pv89ig1bvd2h9vogocp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "doodoo.doodooordoodont",
+            "certificate_hash": "71d6be5880eda41fd7a5cdb7e932880c7f0cbbc3"
+          }
+        },
+        {
+          "client_id": "782707882508-i8d0crqe0ts0njt96loosa03jjls4ifp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQa3VwM_rSGIk9s7EtzAnDivdhlglFOrI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "782707882508-i8d0crqe0ts0njt96loosa03jjls4ifp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

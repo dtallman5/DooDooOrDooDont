@@ -41,11 +41,22 @@
         android:inputType="textPassword"
         android:layout_centerInParent="true"/>
 
+    <Button
+        android:id="@+id/login_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sign In"
+        android:layout_below="@id/password"
+        android:paddingTop="@dimen/padding_medium"
+        android:layout_centerInParent="true"
+        />
+
     <com.facebook.login.widget.LoginButton
         android:id="@+id/facebook_login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/password"
+        android:layout_below="@id/login_button"
+        android:paddingTop="@dimen/padding_medium"
         android:layout_centerInParent="true"/>
 
     <com.google.android.gms.common.SignInButton
@@ -55,5 +66,15 @@
         android:layout_centerInParent="true"
         android:paddingTop="@dimen/padding_medium"
         android:id="@+id/google_login"/>
+
+    <Button
+        android:id="@+id/create_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create Account"
+        android:layout_below="@id/google_login"
+        android:paddingTop="@dimen/padding_large"
+        android:layout_centerInParent="true"
+        />
 
 </RelativeLayout>
