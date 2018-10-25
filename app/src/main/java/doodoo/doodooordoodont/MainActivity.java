@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        AWSMobileClient.getInstance().initialize(this).execute();
+        //AWSMobileClient.getInstance().initialize(this).execute();
 
         //Temporary!!
         //Used when testing the Add Restroom feature, Gets the restroom object from the Add Page
@@ -189,6 +189,9 @@ public class MainActivity extends AppCompatActivity
 
             return true;
         } else if (id == R.id.nav_gallery) {
+            drawer.closeDrawer(GravityCompat.START);
+            nextScreen = new Intent(this,LoginActivity.class);
+            startActivity(nextScreen);
 
         } else if (id == R.id.nav_slideshow) {
 

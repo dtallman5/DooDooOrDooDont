@@ -59,7 +59,7 @@ public class LoginActivity extends Activity {
     public void onStart(){
         super.onStart();
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        updateUI(account);
+        //updateUI(account);
     }
 
     @Override

@@ -51,6 +51,9 @@
     <com.google.android.gms.common.SignInButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/facebook_login"
+        android:layout_centerInParent="true"
+        android:paddingTop="@dimen/padding_medium"
         android:id="@+id/google_login"/>
 
 </RelativeLayout>
