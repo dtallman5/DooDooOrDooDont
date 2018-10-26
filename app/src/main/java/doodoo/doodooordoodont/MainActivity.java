@@ -18,6 +18,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
 import com.amazonaws.mobile.client.AWSMobileClient;
 
@@ -34,6 +36,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
@@ -42,6 +46,8 @@ public class MainActivity extends AppCompatActivity
     private Context context;
     private FusedLocationProviderClient mFusedLocationClient;
     private Restroom toAdd;
+    private FirebaseAuth mAuth;
+
 
     private static final int REQUEST_LOCATION_PERMISSION = 99;
 
@@ -58,7 +64,6 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //AWSMobileClient.getInstance().initialize(this).execute();
 
         //Temporary!!
         //Used when testing the Add Restroom feature, Gets the restroom object from the Add Page
@@ -85,6 +90,7 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+
         //Initializes the google map fragment
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -107,6 +113,19 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        View headerView = navigationView.getHeaderView(0);
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user != null) {
+            ((TextView) headerView.findViewById(R.id.username)).setText(user.getDisplayName());
+            ((TextView) headerView.findViewById(R.id.userEmail)).setText(user.getEmail());
         }
     }
 
@@ -188,7 +207,7 @@ public class MainActivity extends AppCompatActivity
 
 
             return true;
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.nav_login) {
             drawer.closeDrawer(GravityCompat.START);
             nextScreen = new Intent(this,LoginActivity.class);
             startActivity(nextScreen);

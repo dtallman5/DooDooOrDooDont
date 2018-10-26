@@ -9,9 +9,9 @@
             android:icon="@drawable/ic_add_black_24dp"
             android:title="Add Restroom" />
         <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="Gallery" />
+            android:id="@+id/nav_login"
+            android:icon="@drawable/baseline_vpn_key_black_18dp"
+            android:title="Login" />
         <item
             android:id="@+id/nav_slideshow"
             android:icon="@drawable/ic_menu_slideshow"

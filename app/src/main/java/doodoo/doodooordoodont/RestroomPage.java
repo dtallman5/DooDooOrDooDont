@@ -227,8 +227,10 @@ public class RestroomPage extends AppCompatActivity
 
 
             return true;
-        } else if (id == R.id.nav_gallery) {
-
+        } else if (id == R.id.nav_login) {
+            drawer.closeDrawer(GravityCompat.START);
+            nextScreen = new Intent(this,LoginActivity.class);
+            startActivity(nextScreen);
         } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_manage) {

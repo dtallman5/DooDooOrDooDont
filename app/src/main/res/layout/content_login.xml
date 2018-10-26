@@ -16,8 +16,10 @@
 
     <EditText
         android:id="@+id/emailAddress"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
         android:ems="10"
         android:layout_below="@id/textView7"
         android:inputType="textEmailAddress"
@@ -29,14 +31,16 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@id/password"
         android:layout_below="@id/emailAddress"
-        android:text="Password"
+        android:text="Password:"
         android:textColor="@android:color/black" />
 
     <EditText
         android:id="@+id/password"
         android:layout_below="@id/textView11"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
         android:ems="10"
         android:inputType="textPassword"
         android:layout_centerInParent="true"/>
@@ -73,6 +77,16 @@
         android:layout_height="wrap_content"
         android:text="Create Account"
         android:layout_below="@id/google_login"
+        android:paddingTop="@dimen/padding_large"
+        android:layout_centerInParent="true"
+        />
+
+    <Button
+        android:id="@+id/delete_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Delete Account"
+        android:layout_below="@id/create_button"
         android:paddingTop="@dimen/padding_large"
         android:layout_centerInParent="true"
         />
