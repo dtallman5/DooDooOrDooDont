@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity
     private static GoogleMap mMap;
     private Context context;
     private FusedLocationProviderClient mFusedLocationClient;
-    private Restroom toAdd;
     private FirebaseAuth mAuth;
 
 
@@ -74,16 +73,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
-        //Temporary!!
-        //Used when testing the Add Restroom feature, Gets the restroom object from the Add Page
-        Intent here = getIntent();
-        if (here.getParcelableExtra("Restroom") != null){
-            toAdd = here.getParcelableExtra("Restroom");
-        }
-        else {toAdd = new Restroom("3","null");}
-
         context = this; //Saves the context so that it can be used in internal classes.
 
         //Sets the content view and initializes the toolbar
@@ -300,48 +289,25 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-
-        /* **************************************************************** *
-         * Temporary Hard-coded restrooms and markers for testing purposes  *
-         * **************************************************************** */
-        LatLng sydney = new LatLng(-34, 151);
-        Restroom rm = new Restroom("001", "Test Bathroom");
-        rm.setRatings(4.5f, 100, 2.1f, 5);
-        Marker m = mMap.addMarker(new MarkerOptions().position(sydney));
-        rm.setLocation(sydney.latitude,sydney.longitude);
-        m.setTag(rm);
-
-        /*LatLng homePos = new LatLng(32.878695, -117.212936);
-        Marker m2 = mMap.addMarker(new MarkerOptions().position(homePos));
-        Restroom home = new Restroom("002","Apartment Bathroom");
-        home.setRatings(2.5f,4,2.5f,4);
-        home.setLocation(homePos.latitude, homePos.longitude);
-        m2.setTag(home);*/
-
-
-        //If there is a restroom to add, it makes a marker for it. Once again only for testing
-        //purposes
-        if (toAdd != null){
-            db.collection("restrooms")
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            if (task.isSuccessful()) {
-                                for (QueryDocumentSnapshot document : task.getResult()) {
-                                    Log.d(TAG, document.getId() + " => " + document.getData());
-                                    toAdd = new Restroom(document.getData());
-                                    LatLng toAddPos = new LatLng(toAdd.getLat(), toAdd.getLon());
-                                    Marker m3 = mMap.addMarker(new MarkerOptions().position(toAddPos));
-                                    m3.setTag(toAdd);
-                                }
-                            } else {
-                                Log.w(TAG, "Error getting documents.", task.getException());
+        //Adds the restrooms from the database
+        db.collection("restrooms")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d(TAG, document.getId() + " => " + document.getData());
+                                Restroom toAdd = new Restroom(document.getData());
+                                LatLng toAddPos = new LatLng(toAdd.getLat(), toAdd.getLon());
+                                Marker m = mMap.addMarker(new MarkerOptions().position(toAddPos));
+                                m.setTag(toAdd);
                             }
+                        } else {
+                            Log.w(TAG, "Error getting documents.", task.getException());
                         }
-                    });
-        }
-
+                    }
+                });
     }
 
     /**
