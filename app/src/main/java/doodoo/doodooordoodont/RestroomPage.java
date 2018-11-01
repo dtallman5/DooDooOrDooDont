@@ -102,7 +102,7 @@ public class RestroomPage extends AppCompatActivity
 
         //Sets the rating for the Rating bar
         RatingBar ratingBar = findViewById(R.id.bathroomRating);
-        ratingBar.setRating(restroom.getmAvgRating());
+        ratingBar.setRating((float)restroom.getmAvgRating());
 
         // Sets the text for the number of ratings label
         TextView numRatings = findViewById(R.id.numReviews);

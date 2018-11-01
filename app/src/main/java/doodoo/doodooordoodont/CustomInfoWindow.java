@@ -42,7 +42,7 @@ public class CustomInfoWindow implements GoogleMap.InfoWindowAdapter {
         TabHost.TabSpec spec = host.newTabSpec("Male");
         spec.setContent(R.id.tab1);
         RatingBar mAvg = (RatingBar) v.findViewById(R.id.maleAvg);
-        mAvg.setRating(rm.getmAvgRating());
+        mAvg.setRating((float)rm.getmAvgRating());
         TextView mNum = (TextView) v.findViewById(R.id.maleNum);
         mNum.setText(Integer.toString(rm.getmNumRatings()));
         TextView mName = (TextView) v.findViewById(R.id.maleName);
@@ -53,7 +53,7 @@ public class CustomInfoWindow implements GoogleMap.InfoWindowAdapter {
         spec = host.newTabSpec("Female");
         spec.setContent(R.id.tab2);
         TextView fAvg = (TextView) v.findViewById(R.id.femaleAvg);
-        fAvg.setText(Float.toString(rm.getfAvgRating()));
+        fAvg.setText(Double.toString(rm.getfAvgRating()));
         TextView fNum = (TextView) v.findViewById(R.id.femaleNum);
         fNum.setText(Integer.toString(rm.getfNumRatings()));
         TextView fName = (TextView) v.findViewById(R.id.femaleName);

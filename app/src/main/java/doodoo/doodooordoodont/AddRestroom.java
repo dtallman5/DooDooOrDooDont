@@ -2,10 +2,12 @@ package doodoo.doodooordoodont;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -16,6 +18,11 @@ import android.widget.RadioGroup;
 import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 
 /*
@@ -35,6 +42,9 @@ public class AddRestroom extends AppCompatActivity implements TextWatcher{
     private EditText name;     //The edit text field for the bathroom name
     private RatingBar ratings; //The rating bar
     double lon, lat;           //Variables to hold the user's location when add restroom initiated
+    private FirebaseFirestore db;
+    private static final String TAG = "AddRestroom";
+
 
     /**
      * onCreate
@@ -49,6 +59,7 @@ public class AddRestroom extends AppCompatActivity implements TextWatcher{
         super.onCreate(savedInstanceState);
 
         //Uses the activity's intent in order to get the user's location
+        db = FirebaseFirestore.getInstance();
         Intent in = this.getIntent();
         lon = in.getDoubleExtra("Lon",0);
         lat = in.getDoubleExtra("Lat", 0);
@@ -138,8 +149,22 @@ public class AddRestroom extends AppCompatActivity implements TextWatcher{
         Restroom toAdd = new Restroom("003", name.getText().toString());
         toAdd.setRatings(ratings.getRating(),1,ratings.getRating(),1);
         toAdd.setLocation(lat, lon);
+        db.collection("restrooms")
+                .add(toAdd.toMap())
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error adding document", e);
+                    }
+                });
         Intent backHome = new Intent(this,MainActivity.class);
-        backHome.putExtra("Restroom", toAdd);
+        //backHome.putExtra("Restroom", toAdd);
         startActivity(backHome);
     }
 

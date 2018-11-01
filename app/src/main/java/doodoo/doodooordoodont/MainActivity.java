@@ -16,10 +16,12 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.amazonaws.mobile.client.AWSMobileClient;
 
@@ -35,9 +37,15 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
@@ -49,7 +57,10 @@ public class MainActivity extends AppCompatActivity
     private FirebaseAuth mAuth;
 
 
+    private FirebaseFirestore db;
     private static final int REQUEST_LOCATION_PERMISSION = 99;
+    private static final String TAG = "MainActivity";
+
 
     /**
      * onCreate:
@@ -71,6 +82,7 @@ public class MainActivity extends AppCompatActivity
         if (here.getParcelableExtra("Restroom") != null){
             toAdd = here.getParcelableExtra("Restroom");
         }
+        else {toAdd = new Restroom("3","null");}
 
         context = this; //Saves the context so that it can be used in internal classes.
 
@@ -97,6 +109,8 @@ public class MainActivity extends AppCompatActivity
         mapFragment.getMapAsync(this);
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
     }
 
     /**
@@ -126,6 +140,26 @@ public class MainActivity extends AppCompatActivity
         if (user != null) {
             ((TextView) headerView.findViewById(R.id.username)).setText(user.getDisplayName());
             ((TextView) headerView.findViewById(R.id.userEmail)).setText(user.getEmail());
+        }
+        else {
+            mAuth.signInAnonymously()
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                // Sign in success, update UI with the signed-in user's information
+                                Log.d(TAG, "signInAnonymously:success");
+                                FirebaseUser user = mAuth.getCurrentUser();
+                            } else {
+                                // If sign in fails, display a message to the user.
+                                Log.w(TAG, "signInAnonymously:failure", task.getException());
+                                Toast.makeText(MainActivity.this, "Authentication failed.",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+            ((TextView) headerView.findViewById(R.id.username)).setText("Guest");
+            ((TextView) headerView.findViewById(R.id.userEmail)).setText("Please login");
         }
     }
 
@@ -277,20 +311,35 @@ public class MainActivity extends AppCompatActivity
         rm.setLocation(sydney.latitude,sydney.longitude);
         m.setTag(rm);
 
-        LatLng homePos = new LatLng(32.878695, -117.212936);
+        /*LatLng homePos = new LatLng(32.878695, -117.212936);
         Marker m2 = mMap.addMarker(new MarkerOptions().position(homePos));
         Restroom home = new Restroom("002","Apartment Bathroom");
         home.setRatings(2.5f,4,2.5f,4);
         home.setLocation(homePos.latitude, homePos.longitude);
-        m2.setTag(home);
+        m2.setTag(home);*/
 
 
         //If there is a restroom to add, it makes a marker for it. Once again only for testing
         //purposes
         if (toAdd != null){
-            LatLng toAddPos = new LatLng(toAdd.getLat(), toAdd.getLon());
-            Marker m3 = mMap.addMarker(new MarkerOptions().position(toAddPos));
-            m3.setTag(toAdd);
+            db.collection("restrooms")
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    Log.d(TAG, document.getId() + " => " + document.getData());
+                                    toAdd = new Restroom(document.getData());
+                                    LatLng toAddPos = new LatLng(toAdd.getLat(), toAdd.getLon());
+                                    Marker m3 = mMap.addMarker(new MarkerOptions().position(toAddPos));
+                                    m3.setTag(toAdd);
+                                }
+                            } else {
+                                Log.w(TAG, "Error getting documents.", task.getException());
+                            }
+                        }
+                    });
         }
 
     }
