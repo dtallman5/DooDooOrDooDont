@@ -1,7 +1,13 @@
 package doodoo.doodooordoodont;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+
+import android.support.annotation.NonNull;
+import android.util.Log;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,154 +16,119 @@ import java.util.Map;
  * Created by David on 2/11/2018.
  */
 
-public class Restroom implements Parcelable{
+public class Restroom {
     private String UID;
 
     private String name;
 
     private double mAvgRating;
     private int mNumRatings;
-    private int mNumStalls;
+    private String mNumStalls;
     private double fAvgRating;
     private int fNumRatings;
-    private int fNumStalls;
+    private String fNumStalls;
     private double lat,lon;
+    private FirebaseFirestore db;
+    private static String TAG = "Restroom";
 
     public static boolean menDisplayed;
 
-    public Restroom(String UID, String name) {
-        this.UID = UID;
-        this.name = name;
+    public Restroom(){
+        menDisplayed=true;
+
+    }
+
+    public Restroom(String UID) {
+        db = FirebaseFirestore.getInstance();
+        db.document("/restrooms/"+UID)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            setData(document.getData());
+                            setUID(document.getId());
+                        } else {
+                            Log.w(TAG, "Error getting documents.", task.getException());
+                        }
+                    }
+                });
         menDisplayed = true;
     }
 
-    public  Restroom(Map map){
-        UID = (String) map.get("UID");
+    private void setData(Map map){
         name = (String) map.get("name");
         mAvgRating = (double) map.get("mAvgRating");
         mNumRatings = (int) ((long) map.get("mNumRatings"));
-        mNumRatings = (int) ((long)map.get("mNumStalls"));
+        mNumStalls = (String) map.get("mNumStalls");
         fAvgRating = (double) map.get("fAvgRating");
         fNumRatings = (int) ((long)map.get("fNumRatings"));
-        fNumStalls = (int) ((long) map.get("fNumStalls"));
+        fNumStalls = (String) map.get("fNumStalls");
         lat = (double) map.get("lat");
         lon = (double) map.get("lon");
+        menDisplayed = true;
     }
 
+    public void setName(String name) { this.name = name; }
 
-    public void setRatings(float mAvgRating, int mNumRatings,float fAvgRating, int fNumRatings) {
+    public String getmNumStalls() { return mNumStalls; }
+
+    public void setmNumStalls(String mNumStalls) { this.mNumStalls = mNumStalls; }
+
+    public String getfNumStalls() { return fNumStalls; }
+
+    public void setfNumStalls(String fNumStalls) { this.fNumStalls = fNumStalls; }
+
+    public void setRatings(float mAvgRating, int mNumRatings, float fAvgRating, int fNumRatings) {
         this.fNumRatings = fNumRatings;
         this.fAvgRating = fAvgRating;
         this.mNumRatings = mNumRatings;
+
         this.mAvgRating = mAvgRating;
     }
 
-    public double getmAvgRating() {
-        return mAvgRating;
-    }
+    public void setUID(String UID) { this.UID = UID; }
 
-    public int getmNumRatings() {
-        return mNumRatings;
-    }
+    public double getmAvgRating() { return mAvgRating; }
 
-    public double getfAvgRating() {
-        return fAvgRating;
-    }
+    public int getmNumRatings() { return mNumRatings; }
 
-    public int getfNumRatings() {
-        return fNumRatings;
-    }
+    public double getfAvgRating() { return fAvgRating; }
 
-    public String getUID() {
-        return UID;
-    }
+    public int getfNumRatings() { return fNumRatings; }
 
-    public String getName() {
-        return name;
-    }
+    public String getUID() { return UID; }
 
-    public static boolean isMenDisplayed() {
-        return menDisplayed;
-    }
+    public String getName() { return name; }
 
-    public static void setMenDisplayed(boolean bool) {
-        menDisplayed = bool;
-    }
+    public static boolean isMenDisplayed() { return menDisplayed; }
+
+    public static void setMenDisplayed(boolean bool) { menDisplayed = bool; }
 
     public void setLocation(double lat, double lon) {
         this.lat = lat;
         this.lon = lon;
     }
 
-    public double getLat() {
-        return lat;
-    }
+    public double getLat() { return lat; }
 
-    public double getLon() {
-        return lon;
-    }
-
-    protected Restroom(Parcel in) {
-        UID = in.readString();
-        name = in.readString();
-        mAvgRating = in.readFloat();
-        mNumRatings = in.readInt();
-        mNumStalls = in.readInt();
-        fAvgRating = in.readFloat();
-        fNumRatings = in.readInt();
-        fNumStalls = in.readInt();
-        lat = in.readDouble();
-        lon = in.readDouble();
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(UID);
-        dest.writeString(name);
-        dest.writeDouble(mAvgRating);
-        dest.writeInt(mNumRatings);
-        dest.writeInt(mNumStalls);
-        dest.writeDouble(fAvgRating);
-        dest.writeInt(fNumRatings);
-        dest.writeInt(fNumStalls);
-        dest.writeDouble(lat);
-        dest.writeDouble(lon);
-    }
-
+    public double getLon() { return lon; }
 
     public Map toMap() {
 
         Map<String, Object> map  = new HashMap<>();
 
-        map.put("UID", UID);
         map.put("name", name);
         map.put("mAvgRating", mAvgRating);
-        map.put("mNumRatings", (Integer) mNumRatings);
-        map.put("mNumStalls", (Integer) mNumStalls);
+        map.put("mNumRatings", mNumRatings);
+        map.put("mNumStalls", mNumStalls);
         map.put("fAvgRating", fAvgRating);
-        map.put("fNumRatings", (Integer) fNumRatings);
-        map.put("fNumStalls", (Integer) fNumStalls);
+        map.put("fNumRatings", fNumRatings);
+        map.put("fNumStalls", fNumStalls);
         map.put("lat",lat);
         map.put("lon",lon);
 
         return map;
     }
-
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<Restroom> CREATOR = new Parcelable.Creator<Restroom>() {
-        @Override
-        public Restroom createFromParcel(Parcel in) {
-            return new Restroom(in);
-        }
-
-        @Override
-        public Restroom[] newArray(int size) {
-            return new Restroom[size];
-        }
-    };
 }

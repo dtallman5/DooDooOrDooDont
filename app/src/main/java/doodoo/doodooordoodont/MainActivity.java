@@ -284,7 +284,7 @@ public class MainActivity extends AppCompatActivity
             public void onInfoWindowLongClick(Marker marker) {
                 Restroom rm = (Restroom) marker.getTag();
                 Intent restroomPage = new Intent(context, RestroomPage.class);
-                restroomPage.putExtra("Restroom", rm);
+                restroomPage.putExtra("Restroom", rm.getUID());
                 startActivity(restroomPage);
             }
         });
@@ -297,8 +297,7 @@ public class MainActivity extends AppCompatActivity
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                Log.d(TAG, document.getId() + " => " + document.getData());
-                                Restroom toAdd = new Restroom(document.getData());
+                                Restroom toAdd = new Restroom(document.getId());
                                 LatLng toAddPos = new LatLng(toAdd.getLat(), toAdd.getLon());
                                 Marker m = mMap.addMarker(new MarkerOptions().position(toAddPos));
                                 m.setTag(toAdd);

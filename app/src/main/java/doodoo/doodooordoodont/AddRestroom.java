@@ -143,12 +143,14 @@ public class AddRestroom extends AppCompatActivity implements TextWatcher{
      *
      * This method is called by the send button's onClickListener and creates the new Restroom.
      *
-     * TODO: Currently much of this is hardcoded garbage. Should eventually add it to the database
      */
     private void createRestroom() {
-        Restroom toAdd = new Restroom("003", name.getText().toString());
+        Restroom toAdd = new Restroom();
+        toAdd.setName( name.getText().toString());
         toAdd.setRatings(ratings.getRating(),1,ratings.getRating(),1);
         toAdd.setLocation(lat, lon);
+        String numStalls = (String)((Spinner)findViewById(R.id.stallSpinner)).getSelectedItem();
+        toAdd.setfNumStalls(numStalls);
         db.collection("restrooms")
                 .add(toAdd.toMap())
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {

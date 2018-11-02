@@ -42,6 +42,7 @@ public class RestroomPage extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
 
     private Context context;
+    String rUID;
     Restroom restroom;
 
     private FusedLocationProviderClient mFusedLocationClient;
@@ -64,7 +65,9 @@ public class RestroomPage extends AppCompatActivity
 
         //Gets the restroom that was associated with the marker whose info window was clicked.
         Intent from = getIntent();
-        restroom = from.getParcelableExtra("Restroom");
+        rUID = from.getStringExtra("Restroom");
+
+
 
         //Sets the content view and initializes the toolbar
         setContentView(R.layout.drawer_restroom);
