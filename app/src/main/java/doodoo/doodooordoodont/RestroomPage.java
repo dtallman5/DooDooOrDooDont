@@ -34,14 +34,18 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 
 public class RestroomPage extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
 
     private Context context;
+    private FirebaseFirestore db;
     String rUID;
     Restroom restroom;
 
@@ -66,7 +70,7 @@ public class RestroomPage extends AppCompatActivity
         //Gets the restroom that was associated with the marker whose info window was clicked.
         Intent from = getIntent();
         rUID = from.getStringExtra("Restroom");
-
+        restroom = new Restroom(rUID,false);
 
 
         //Sets the content view and initializes the toolbar

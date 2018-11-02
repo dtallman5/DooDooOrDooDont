@@ -145,7 +145,8 @@ public class AddRestroom extends AppCompatActivity implements TextWatcher{
      *
      */
     private void createRestroom() {
-        Restroom toAdd = new Restroom();
+        //TODO need to make the restroom other data and restroom ratings be stored differently
+        final Restroom toAdd = new Restroom();
         toAdd.setName( name.getText().toString());
         toAdd.setRatings(ratings.getRating(),1,ratings.getRating(),1);
         toAdd.setLocation(lat, lon);
@@ -157,6 +158,7 @@ public class AddRestroom extends AppCompatActivity implements TextWatcher{
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
                         Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                        toAdd.setUID(documentReference.getId());
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -165,8 +167,8 @@ public class AddRestroom extends AppCompatActivity implements TextWatcher{
                         Log.w(TAG, "Error adding document", e);
                     }
                 });
+        db.collection("restroomData").document(toAdd.getUID()).set(toAdd.extractData());
         Intent backHome = new Intent(this,MainActivity.class);
-        //backHome.putExtra("Restroom", toAdd);
         startActivity(backHome);
     }
 

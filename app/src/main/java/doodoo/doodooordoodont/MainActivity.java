@@ -297,7 +297,7 @@ public class MainActivity extends AppCompatActivity
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                Restroom toAdd = new Restroom(document.getId());
+                                Restroom toAdd = new Restroom(document.getId(),true);
                                 LatLng toAddPos = new LatLng(toAdd.getLat(), toAdd.getLon());
                                 Marker m = mMap.addMarker(new MarkerOptions().position(toAddPos));
                                 m.setTag(toAdd);

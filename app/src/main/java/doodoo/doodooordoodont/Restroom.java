@@ -38,36 +38,54 @@ public class Restroom {
 
     }
 
-    public Restroom(String UID) {
+    public Restroom(String UID,boolean marker) {
         db = FirebaseFirestore.getInstance();
-        db.document("/restrooms/"+UID)
+        db.document("/restrooms/" + UID)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()) {
                             DocumentSnapshot document = task.getResult();
-                            setData(document.getData());
+                            setMarkerData(document.getData());
                             setUID(document.getId());
                         } else {
                             Log.w(TAG, "Error getting documents.", task.getException());
                         }
                     }
                 });
+        if (!marker) {
+            db.document("/restroomData/" + UID)
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                DocumentSnapshot document = task.getResult();
+                                setOtherData(document.getData());
+                            } else {
+                                Log.w(TAG, "Error getting documents.", task.getException());
+                            }
+                        }
+                    });
+        }
         menDisplayed = true;
     }
 
-    private void setData(Map map){
+    private void setMarkerData(Map map){
         name = (String) map.get("name");
         mAvgRating = (double) map.get("mAvgRating");
         mNumRatings = (int) ((long) map.get("mNumRatings"));
-        mNumStalls = (String) map.get("mNumStalls");
         fAvgRating = (double) map.get("fAvgRating");
         fNumRatings = (int) ((long)map.get("fNumRatings"));
-        fNumStalls = (String) map.get("fNumStalls");
         lat = (double) map.get("lat");
         lon = (double) map.get("lon");
         menDisplayed = true;
+    }
+
+    private void setOtherData(Map map){
+        mNumStalls = (String) map.get("mNumStalls");
+        fNumStalls = (String) map.get("fNumStalls");
     }
 
     public void setName(String name) { this.name = name; }
@@ -122,13 +140,18 @@ public class Restroom {
         map.put("name", name);
         map.put("mAvgRating", mAvgRating);
         map.put("mNumRatings", mNumRatings);
-        map.put("mNumStalls", mNumStalls);
         map.put("fAvgRating", fAvgRating);
         map.put("fNumRatings", fNumRatings);
-        map.put("fNumStalls", fNumStalls);
         map.put("lat",lat);
         map.put("lon",lon);
 
+        return map;
+    }
+
+    public Map extractData(){
+        Map<String, Object> map  = new HashMap<>();
+        map.put("mNumStalls", mNumStalls);
+        map.put("fNumStalls", fNumStalls);
         return map;
     }
 }
