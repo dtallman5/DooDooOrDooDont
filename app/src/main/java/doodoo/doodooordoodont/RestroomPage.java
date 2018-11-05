@@ -3,6 +3,7 @@ package doodoo.doodooordoodont;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,11 +15,13 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
@@ -37,8 +40,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 
 public class RestroomPage extends AppCompatActivity
@@ -46,6 +52,7 @@ public class RestroomPage extends AppCompatActivity
 
     private Context context;
     private FirebaseFirestore db;
+    private static final String TAG = "RestroomPage";
     String rUID;
     Restroom restroom;
 
@@ -63,6 +70,7 @@ public class RestroomPage extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        db = FirebaseFirestore.getInstance();
 
         //Saves the context for later usage
         context = this;
@@ -70,9 +78,38 @@ public class RestroomPage extends AppCompatActivity
         //Gets the restroom that was associated with the marker whose info window was clicked.
         Intent from = getIntent();
         rUID = from.getStringExtra("Restroom");
-        restroom = new Restroom(rUID,false);
+        DocumentReference docRef = db.collection("restrooms").document(rUID);
+        docRef.get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            restroom = new Restroom(document.getId(), document.getData());
+                            getOtherRestroomData();
+                        } else {
+                            Log.w(TAG, "Error getting documents.", task.getException());
+                        }
+                    }
+                });
+    }
 
+    private void getOtherRestroomData() {
+        DocumentReference docRef = db.collection("restroomData").document(rUID);
+        docRef.get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()){
+                            DocumentSnapshot document = task.getResult();
+                            restroom.setOtherData(document.getData());
+                            updateUI();
+                        }
+                    }
+                });
+    }
 
+    private void updateUI() {
         //Sets the content view and initializes the toolbar
         setContentView(R.layout.drawer_restroom);
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -137,6 +174,66 @@ public class RestroomPage extends AppCompatActivity
         //Sets the title of the restroom
         TextView title = findViewById(R.id.restroomName);
         title.setText(restroom.getName());
+
+        Button ratingBtn = (Button) findViewById(R.id.ratingsButton);
+        ratingBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                displayRatings();
+            }
+        });
+    }
+
+    private void displayRatings() {
+        final LinearLayout reviews = (LinearLayout) findViewById(R.id.reviews);
+        db.collection("reviews").document(restroom.getUID()).collection("reviews")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Review rev = new Review(document.getData());
+                                createReviewLayout(rev, reviews);
+                            }
+                            Button hidebtn = new Button(RestroomPage.this);
+                            hidebtn.setText("Hide Reviews");
+                            hidebtn.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    LinearLayout layout = (LinearLayout) findViewById(R.id.reviews);
+                                    Button btn = (Button) findViewById(R.id.ratingsButton);
+                                    layout.setVisibility(View.INVISIBLE);
+                                    btn.setVisibility(View.VISIBLE);
+                                }
+                            });
+                            Button btn = (Button) findViewById(R.id.ratingsButton);
+                            btn.setVisibility(View.INVISIBLE);
+                            reviews.addView(hidebtn);
+                            reviews.setVisibility(View.VISIBLE);
+                        } else {
+                            Log.w(TAG, "Error getting documents.", task.getException());
+                        }
+                    }
+                });
+    }
+
+    private void createReviewLayout(Review rev, LinearLayout reviews) {
+        TextView user = new TextView(RestroomPage.this);
+        user.setText(rev.getReviewer()+ ":");
+        reviews.addView(user);
+        RatingBar rating = new RatingBar(RestroomPage.this);
+        ViewGroup.LayoutParams params = reviews.getLayoutParams();
+        params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+        rating.setLayoutParams(params);
+        rating.setMax(5);
+        rating.setStepSize(0.1f);
+        rating.setRating((float) rev.getRating());
+        rating.setIsIndicator(true);
+        reviews.addView(rating);
+        TextView review = new TextView(RestroomPage.this);
+        review.setText(rev.getReview());
+        reviews.addView(review);
     }
 
     /**

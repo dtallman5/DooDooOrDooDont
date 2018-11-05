@@ -133,10 +133,28 @@
                     android:layout_alignParentStart="true"
                     map:liteMode="true"/>
 
-                <TextView
+                <Button
+                    android:id="@+id/ratingsButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/map"
+                    android:layout_centerInParent="true"
+                    android:text="See All Ratings"/>
+
+                <LinearLayout
+                    android:id="@+id/reviews"
+                    android:layout_below="@+id/ratingsButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="invisible">
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/reviews"
                     android:textSize="144dp"
                     android:text="Test. Add more info here"
                     android:alpha="0.5"/>

@@ -1,6 +1,7 @@
 package doodoo.doodooordoodont;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * Created by David on 4/3/2018.
@@ -10,16 +11,32 @@ public class Review {
 
     private Date date;
     private double rating;
-    private User reviewer;
+    private String reviewer;
     private String review;
     private int[] reactions;
 
 
-    public Review(Date date, User user, double rating, String review){
+    public Review(Date date, String user, double rating, String review){
         this.date = date;
         this.reviewer = user;
         this.rating = rating;
         this.review = review;
+    }
+
+    public Date getDate() { return date; }
+
+    public double getRating() { return rating; }
+
+    public String getReviewer() { return reviewer; }
+
+    public String getReview() { return review; }
+
+    public Review (Map map){
+        this.date = (Date) map.get("date");
+        this.reviewer = (String) map.get("user");
+        this.rating =  (double) map.get("rating");
+        this.review = (String) map.get("review");
+
     }
 
 

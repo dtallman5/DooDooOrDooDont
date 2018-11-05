@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -40,8 +41,8 @@ public class Restroom {
 
     public Restroom(String UID,boolean marker) {
         db = FirebaseFirestore.getInstance();
-        db.document("/restrooms/" + UID)
-                .get()
+        DocumentReference docRef = db.collection("restrooms").document(UID);
+        docRef.get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -72,6 +73,11 @@ public class Restroom {
         menDisplayed = true;
     }
 
+    public Restroom (String UID, Map map){
+        this.UID = UID;
+        setMarkerData(map);
+    }
+
     private void setMarkerData(Map map){
         name = (String) map.get("name");
         mAvgRating = (double) map.get("mAvgRating");
@@ -83,7 +89,7 @@ public class Restroom {
         menDisplayed = true;
     }
 
-    private void setOtherData(Map map){
+    public void setOtherData(Map map){
         mNumStalls = (String) map.get("mNumStalls");
         fNumStalls = (String) map.get("fNumStalls");
     }

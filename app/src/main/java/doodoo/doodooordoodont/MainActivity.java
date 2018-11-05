@@ -5,7 +5,9 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -31,6 +33,8 @@ import com.facebook.appevents.AppEventsLogger;
 //Google Maps Imports
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -46,6 +50,12 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
@@ -129,8 +139,7 @@ public class MainActivity extends AppCompatActivity
         if (user != null) {
             ((TextView) headerView.findViewById(R.id.username)).setText(user.getDisplayName());
             ((TextView) headerView.findViewById(R.id.userEmail)).setText(user.getEmail());
-        }
-        else {
+        } else {
             mAuth.signInAnonymously()
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                         @Override
@@ -213,16 +222,16 @@ public class MainActivity extends AppCompatActivity
         //Checks which item was selected and handles the appropriate action
         if (id == R.id.nav_add_restroom) {
             drawer.closeDrawer(GravityCompat.START);
-            nextScreen = new Intent(this,AddRestroom.class);
+            nextScreen = new Intent(this, AddRestroom.class);
             mFusedLocationClient.getLastLocation()
-                      .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                         @Override
                         public void onSuccess(Location location) {
                             // Got last known location. In some rare situations this can be null
 
                             if (location != null) {
-                                nextScreen.putExtra("Lat",location.getLatitude() );
-                                nextScreen.putExtra("Lon",location.getLongitude());
+                                nextScreen.putExtra("Lat", location.getLatitude());
+                                nextScreen.putExtra("Lon", location.getLongitude());
                                 startActivity(nextScreen);
                             }
                         }
@@ -232,7 +241,7 @@ public class MainActivity extends AppCompatActivity
             return true;
         } else if (id == R.id.nav_login) {
             drawer.closeDrawer(GravityCompat.START);
-            nextScreen = new Intent(this,LoginActivity.class);
+            nextScreen = new Intent(this, LoginActivity.class);
             startActivity(nextScreen);
 
         } else if (id == R.id.nav_slideshow) {
@@ -297,7 +306,7 @@ public class MainActivity extends AppCompatActivity
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                Restroom toAdd = new Restroom(document.getId(),true);
+                                Restroom toAdd = new Restroom(document.getId(), document.getData());
                                 LatLng toAddPos = new LatLng(toAdd.getLat(), toAdd.getLon());
                                 Marker m = mMap.addMarker(new MarkerOptions().position(toAddPos));
                                 m.setTag(toAdd);
@@ -307,6 +316,26 @@ public class MainActivity extends AppCompatActivity
                         }
                     }
                 });
+        LocationManager locationManager = (LocationManager)
+                getSystemService(Context.LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        Location location = locationManager.getLastKnownLocation(locationManager
+                .getBestProvider(criteria, false));
+        double latitude = location.getLatitude();
+        double longitude = location.getLongitude();
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(latitude,longitude)));
+        mMap.moveCamera(CameraUpdateFactory.zoomTo(15));
     }
 
     /**

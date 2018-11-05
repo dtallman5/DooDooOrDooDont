@@ -159,6 +159,7 @@ public class AddRestroom extends AppCompatActivity implements TextWatcher{
                     public void onSuccess(DocumentReference documentReference) {
                         Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
                         toAdd.setUID(documentReference.getId());
+                        db.collection("restroomData").document(toAdd.getUID()).set(toAdd.extractData());
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -167,7 +168,7 @@ public class AddRestroom extends AppCompatActivity implements TextWatcher{
                         Log.w(TAG, "Error adding document", e);
                     }
                 });
-        db.collection("restroomData").document(toAdd.getUID()).set(toAdd.extractData());
+        //db.collection("restroomData").document(toAdd.getUID()).set(toAdd.extractData());
         Intent backHome = new Intent(this,MainActivity.class);
         startActivity(backHome);
     }
