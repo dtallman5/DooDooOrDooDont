@@ -55,6 +55,8 @@ public class RestroomPage extends AppCompatActivity
     private static final String TAG = "RestroomPage";
     String rUID;
     Restroom restroom;
+    boolean downloadedReviews = false;
+    private final int hideID = 56532;
 
     private FusedLocationProviderClient mFusedLocationClient;
 
@@ -186,36 +188,51 @@ public class RestroomPage extends AppCompatActivity
 
     private void displayRatings() {
         final LinearLayout reviews = (LinearLayout) findViewById(R.id.reviews);
-        db.collection("reviews").document(restroom.getUID()).collection("reviews")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Review rev = new Review(document.getData());
-                                createReviewLayout(rev, reviews);
-                            }
-                            Button hidebtn = new Button(RestroomPage.this);
-                            hidebtn.setText("Hide Reviews");
-                            hidebtn.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    LinearLayout layout = (LinearLayout) findViewById(R.id.reviews);
-                                    Button btn = (Button) findViewById(R.id.ratingsButton);
-                                    layout.setVisibility(View.INVISIBLE);
-                                    btn.setVisibility(View.VISIBLE);
+        if (!downloadedReviews) {
+            db.collection("reviews").document(restroom.getUID()).collection("reviews")
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    Review rev = new Review(document.getData());
+                                    createReviewLayout(rev, reviews);
                                 }
-                            });
-                            Button btn = (Button) findViewById(R.id.ratingsButton);
-                            btn.setVisibility(View.INVISIBLE);
-                            reviews.addView(hidebtn);
-                            reviews.setVisibility(View.VISIBLE);
-                        } else {
-                            Log.w(TAG, "Error getting documents.", task.getException());
+                                Button hidebtn = new Button(RestroomPage.this);
+                                hidebtn.setText("Hide Reviews");
+                                hidebtn.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        displayRatings();
+                                    }
+                                });
+                                hidebtn.setId(hideID);
+                                Button btn = (Button) findViewById(R.id.ratingsButton);
+                                btn.setVisibility(View.GONE);
+                                reviews.addView(hidebtn);
+                                reviews.setVisibility(View.VISIBLE);
+                            } else {
+                                Log.w(TAG, "Error getting documents.", task.getException());
+                            }
                         }
-                    }
-                });
+                    });
+            downloadedReviews=true;
+        }
+        else{
+            Button btn = (Button) findViewById(R.id.ratingsButton);
+            Button hidebtn = (Button) findViewById(hideID);
+            if (btn.getVisibility()!=View.GONE) {
+                btn.setVisibility(View.GONE);
+                reviews.setVisibility(View.VISIBLE);
+                hidebtn.setVisibility(View.VISIBLE);
+            }
+            else {
+                btn.setVisibility(View.VISIBLE);
+                reviews.setVisibility(View.GONE);
+                hidebtn.setVisibility(View.GONE);
+            }
+        }
     }
 
     private void createReviewLayout(Review rev, LinearLayout reviews) {

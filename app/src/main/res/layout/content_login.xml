@@ -55,11 +55,21 @@
         android:layout_centerInParent="true"
         />
 
+    <Button
+        android:id="@+id/logout_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sign Out"
+        android:layout_below="@id/login_button"
+        android:paddingTop="@dimen/padding_medium"
+        android:layout_centerInParent="true"
+        />
+
     <com.facebook.login.widget.LoginButton
         android:id="@+id/facebook_login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/login_button"
+        android:layout_below="@id/logout_button"
         android:paddingTop="@dimen/padding_medium"
         android:layout_centerInParent="true"/>
 

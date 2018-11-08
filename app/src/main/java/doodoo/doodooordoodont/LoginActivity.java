@@ -132,6 +132,18 @@ public class LoginActivity extends Activity {
 
         });
 
+        final Button logout = (Button)findViewById(R.id.logout_button);
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FirebaseAuth.getInstance().signOut();
+                Toast.makeText(LoginActivity.this,"Successfully signed out.",
+                        Toast.LENGTH_SHORT).show();
+                Intent toHome = new Intent(LoginActivity.this, MainActivity.class);
+                startActivity(toHome);
+            }
+        });
+
         final Button deleteAccount = (Button)findViewById(R.id.delete_button);
         deleteAccount.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -281,7 +293,10 @@ public class LoginActivity extends Activity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
+                            Toast.makeText(LoginActivity.this,"Successfully logged in.",
+                                    Toast.LENGTH_SHORT).show();
+                            Intent toHome = new Intent(LoginActivity.this,MainActivity.class);
+                            startActivity(toHome);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithEmail:failure", task.getException());
