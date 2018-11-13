@@ -11,7 +11,9 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -50,7 +52,6 @@ public class LoginActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         FacebookSdk.sdkInitialize(getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
 
@@ -60,6 +61,24 @@ public class LoginActivity extends Activity {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         setContentView(R.layout.content_login);
+
+        EditText password = (EditText) findViewById(R.id.password);
+        password.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
+                int result = actionId & EditorInfo.IME_MASK_ACTION;
+                switch(result) {
+                    case EditorInfo.IME_ACTION_DONE:
+                        if (validateForm()){
+                            signIn(((TextView)findViewById(R.id.emailAddress)).getText().toString(),
+                                    ((TextView)findViewById(R.id.password)).getText().toString());
+                        }
+                        break;
+                }
+                return true;
+            }
+        });
+
         loginButton = findViewById(R.id.facebook_login);
         TextView textView = (TextView) ((SignInButton)findViewById(R.id.google_login)).getChildAt(0);
         textView.setText("Sign In with Google");
