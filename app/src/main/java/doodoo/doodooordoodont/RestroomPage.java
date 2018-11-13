@@ -352,16 +352,7 @@ public class RestroomPage extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
             nextScreen = new Intent(this,LoginActivity.class);
             startActivity(nextScreen);
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
         }
-
         //Closes the drawer
         drawer.closeDrawer(GravityCompat.START);
         return true;

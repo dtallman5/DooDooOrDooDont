@@ -212,8 +212,6 @@ public class MainActivity extends AppCompatActivity
      * @param item The item that was selected and initiated the method call.
      * @return A boolean based on whether the method executed successfully
      */
-    @SuppressLint("MissingPermission")
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Gets the id of the item selected
@@ -230,7 +228,6 @@ public class MainActivity extends AppCompatActivity
                         @Override
                         public void onSuccess(Location location) {
                             // Got last known location. In some rare situations this can be null
-
                             if (location != null) {
                                 nextScreen.putExtra("Lat", location.getLatitude());
                                 nextScreen.putExtra("Lon", location.getLongitude());
@@ -238,25 +235,16 @@ public class MainActivity extends AppCompatActivity
                             }
                         }
                     });
-
-
             return true;
         } else if (id == R.id.nav_login) {
             drawer.closeDrawer(GravityCompat.START);
             nextScreen = new Intent(this, LoginActivity.class);
             startActivity(nextScreen);
+
         } else if (id == R.id.nav_my_account) {
             drawer.closeDrawer(GravityCompat.START);
             nextScreen = new Intent(this, MyAccount.class);
             startActivity(nextScreen);
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
         }
 
         //Closes the drawer
