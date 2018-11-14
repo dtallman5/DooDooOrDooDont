@@ -52,16 +52,19 @@ public class LoginActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.content_login);
+
+        //Initializes the Facebook Sdk
         FacebookSdk.sdkInitialize(getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
 
+        //Initializes variables for google sign in
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        setContentView(R.layout.content_login);
-
+        //Adds an OnEditorActionListener to listen for the Done button and login the user
         EditText password = (EditText) findViewById(R.id.password);
         password.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -79,10 +82,12 @@ public class LoginActivity extends Activity {
             }
         });
 
-        loginButton = findViewById(R.id.facebook_login);
+        //Changes the text of the Google sign in button
         TextView textView = (TextView) ((SignInButton)findViewById(R.id.google_login)).getChildAt(0);
         textView.setText("Sign In with Google");
 
+        //Not used code for registering a callback of the facebook button
+        loginButton = findViewById(R.id.facebook_login);
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
@@ -102,31 +107,41 @@ public class LoginActivity extends Activity {
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
+
+        //Adds the Createaccount dialog to the buttons onclicklistener
         final Button createAccount = (Button)findViewById(R.id.create_button);
         createAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //Creates the alertdialog and the layout to add the fields to
                 AlertDialog.Builder alert = new AlertDialog.Builder(LoginActivity.this);
+                alert.setMessage("Please enter your information");
+                alert.setTitle("Account Creation");
                 final LinearLayout layout = new LinearLayout(LoginActivity.this);
                 layout.setOrientation(LinearLayout.VERTICAL);
+
+                //Username field
                 final EditText username = new EditText(LoginActivity.this);
                 username.setHint("Username");
                 username.setWidth(layout.getWidth());
+
+                //Password field
                 final EditText pass = new EditText(LoginActivity.this);
                 pass.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
                 pass.setHint("Password");
                 pass.setWidth(layout.getWidth());
+
+                //email field
                 final EditText email = new EditText(LoginActivity.this);
                 email.setHint("Email");
                 email.setWidth(layout.getWidth());
-                layout.addView(username);
-                layout.addView(pass);
-                layout.addView(email);
-                alert.setMessage("Please enter your information");
-                alert.setTitle("Account Creation");
 
+                layout.addView(username);
+                layout.addView(pass);       //Adds field to layout
+                layout.addView(email);
                 alert.setView(layout);
 
+                //Sets the positive button to call create account with the fields
                 alert.setPositiveButton("Create Account", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         createAccount(username.getText().toString(),pass.getText().toString(),email.getText().toString());
@@ -137,6 +152,7 @@ public class LoginActivity extends Activity {
             }
         });
 
+        //Adds onClick to login button to validate the entries and attempt to sign in user
         final Button login = (Button)findViewById(R.id.login_button);
         login.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -151,6 +167,7 @@ public class LoginActivity extends Activity {
 
         });
 
+        //Adds onClick to logout the user and sends user to the login screen
         final Button logout = (Button)findViewById(R.id.logout_button);
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -158,22 +175,25 @@ public class LoginActivity extends Activity {
                 FirebaseAuth.getInstance().signOut();
                 Toast.makeText(LoginActivity.this,"Successfully signed out.",
                         Toast.LENGTH_SHORT).show();
-                Intent toHome = new Intent(LoginActivity.this, MainActivity.class);
-                startActivity(toHome);
+                Intent toLogin = new Intent(LoginActivity.this, MainActivity.class);
+                startActivity(toLogin);
             }
         });
 
+        //Adds onClick to prompt the user and confirm deletion of account
         final Button deleteAccount = (Button)findViewById(R.id.delete_button);
         deleteAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                reauthUser();
+                reauthUser();   //Reauthorizes the user if necessary
 
-                AlertDialog.Builder builder1 = new AlertDialog.Builder(LoginActivity.this);
-                builder1.setMessage("Are you sure you wish to delete account?");
-                builder1.setCancelable(true);
+                //Creates the alert dialog
+                AlertDialog.Builder alert = new AlertDialog.Builder(LoginActivity.this);
+                alert.setMessage("Are you sure you wish to delete account?");
+                alert.setCancelable(true);
 
-                builder1.setPositiveButton(
+                //If yes is selected it deletes the user from database
+                alert.setPositiveButton(
                         "Yes",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
@@ -181,8 +201,8 @@ public class LoginActivity extends Activity {
                                 dialog.cancel();
                             }
                         });
-
-                builder1.setNegativeButton(
+                //If no is slected it cancels the dialog
+                alert.setNegativeButton(
                         "No",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
@@ -190,8 +210,7 @@ public class LoginActivity extends Activity {
                             }
                         });
 
-                AlertDialog alert11 = builder1.create();
-                alert11.show();
+                alert.show();
             }
         });
     }
