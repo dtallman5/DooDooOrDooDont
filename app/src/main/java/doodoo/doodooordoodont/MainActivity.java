@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-
+        //Initializes the location client and the Firebase variables
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -111,14 +111,27 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+
+    /**
+     * onStart:
+     *
+     * This method is called every time the activity is started. This means that it is
+     * not just called when the activity is created, but also when the app switches to
+     * this activity through an intent. I use it here to update the navigation header to
+     * display the current logged in users info.
+     */
     @Override
     public void onStart() {
         super.onStart();
+
+        //Grabs the navigation header and the current user
         NavigationView navigationView = findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
+        //If there is no user at all, then it signs them in as an anonymous user
         if (user == null) {
+            //Signs them in and once complete, updates the map by calling getMapAsync
             mAuth.signInAnonymously()
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                         @Override
@@ -137,30 +150,32 @@ public class MainActivity extends AppCompatActivity
                             }
                         }
                     });
+            //Sets the menu to the non-logged in version and sets info to guest
             navigationView.getMenu().clear();
             navigationView.inflateMenu(R.menu.activity_main_drawer);
             ((TextView) headerView.findViewById(R.id.username)).setText("Guest");
             ((TextView) headerView.findViewById(R.id.userEmail)).setText("Please login");
+            return;
         }
+        //If the user is already anonymously logged in, set info to guest
         else if (user.isAnonymous()) {
             navigationView.getMenu().clear();
             navigationView.inflateMenu(R.menu.activity_main_drawer);
             ((TextView) headerView.findViewById(R.id.username)).setText("Guest");
             ((TextView) headerView.findViewById(R.id.userEmail)).setText("Please login");
-            SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.map);
-            mapFragment.getMapAsync(MainActivity.this);
         }
+        //If the user is not anonymous, set the info to their info
         else {
             navigationView.getMenu().clear();
             navigationView.inflateMenu(R.menu.activity_main_drawer_loggedin);
             ((TextView) headerView.findViewById(R.id.username)).setText(user.getDisplayName());
             ((TextView) headerView.findViewById(R.id.userEmail)).setText(user.getEmail());
-            SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.map);
-            mapFragment.getMapAsync(MainActivity.this);
         }
 
+        //Updates the map after changing the navigation header
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(MainActivity.this);
     }
 
     /**
@@ -223,6 +238,7 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_add_restroom) {
             drawer.closeDrawer(GravityCompat.START);
             nextScreen = new Intent(this, AddRestroom.class);
+            //Gets the user's location and sends that to the AddRestroom class
             mFusedLocationClient.getLastLocation()
                     .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                         @Override
@@ -236,12 +252,15 @@ public class MainActivity extends AppCompatActivity
                         }
                     });
             return true;
-        } else if (id == R.id.nav_login) {
+        }
+        //If login is selected send the user to the login page
+        else if (id == R.id.nav_login) {
             drawer.closeDrawer(GravityCompat.START);
             nextScreen = new Intent(this, LoginActivity.class);
             startActivity(nextScreen);
-
-        } else if (id == R.id.nav_my_account) {
+        }
+        //If my_account is selected, send them to the my account page
+        else if (id == R.id.nav_my_account) {
             drawer.closeDrawer(GravityCompat.START);
             nextScreen = new Intent(this, MyAccount.class);
             startActivity(nextScreen);
@@ -257,16 +276,19 @@ public class MainActivity extends AppCompatActivity
      * onMapReady:
      * <p>
      * Called when the google map fragment is ready. Used to initialize markers and other factors
-     * associated with the map fragment
+     * associated with the map fragment. Called after getMapAsync() is called.
      *
      * @param googleMap The map that is ready
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        enableMyLocation();
+        enableMyLocation(); //Enables the users location
 
+        //Sets the info window to the custom info window
         mMap.setInfoWindowAdapter(new CustomInfoWindow(this));
+
+        //Adds an onclicklistener that switches the displayed gender
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
@@ -281,6 +303,8 @@ public class MainActivity extends AppCompatActivity
                 marker.showInfoWindow();
             }
         });
+
+        //OnLongClickListener that opens the Restrooms page
         mMap.setOnInfoWindowLongClickListener(new GoogleMap.OnInfoWindowLongClickListener() {
             @Override
             public void onInfoWindowLongClick(Marker marker) {
@@ -298,6 +322,7 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
+                            //Loops through all documents and adds a marker to the map
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Restroom toAdd = new Restroom(document.getId(), document.getData());
                                 LatLng toAddPos = new LatLng(toAdd.getLat(), toAdd.getLon());
@@ -319,21 +344,26 @@ public class MainActivity extends AppCompatActivity
      * those permissions.
      */
     private void enableMyLocation() {
+        //Checks to see if the app has location permission
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
+
+            //Enables myLocation on the map
             mMap.setMyLocationEnabled(true);
 
+            //Gets the users logation and moves the camera to that location
             LocationManager locationManager = (LocationManager)
                     getSystemService(Context.LOCATION_SERVICE);
-            Criteria criteria = new Criteria();
             Location location = locationManager.getLastKnownLocation(locationManager
-                    .getBestProvider(criteria, false));
+                    .getBestProvider(new Criteria(), false));
             double latitude = location.getLatitude();
             double longitude = location.getLongitude();
             mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(latitude,longitude)));
             mMap.moveCamera(CameraUpdateFactory.zoomTo(15));
-        } else {
+        }
+        //If permission is not granted, ask for it.
+        else {
             ActivityCompat.requestPermissions(this, new String[]
                             {Manifest.permission.ACCESS_FINE_LOCATION},
                     REQUEST_LOCATION_PERMISSION);

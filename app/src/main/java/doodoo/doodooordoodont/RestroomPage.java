@@ -3,7 +3,6 @@ package doodoo.doodooordoodont;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -78,6 +77,7 @@ public class RestroomPage extends AppCompatActivity
         context = this;
 
         //Gets the restroom that was associated with the marker whose info window was clicked.
+        //by using the UID that was pass through the intent to get it from the database
         Intent from = getIntent();
         rUID = from.getStringExtra("Restroom");
         DocumentReference docRef = db.collection("restrooms").document(rUID);
@@ -86,6 +86,7 @@ public class RestroomPage extends AppCompatActivity
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()) {
+                            //Creates the restroom object and then gets the additional info from the db
                             DocumentSnapshot document = task.getResult();
                             restroom = new Restroom(document.getId(), document.getData());
                             getOtherRestroomData();
@@ -94,8 +95,17 @@ public class RestroomPage extends AppCompatActivity
                         }
                     }
                 });
+
+        //Initializes the location client
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
     }
 
+    /**
+     * getOtherRestroomData:
+     *
+     * This method gets the additional information from the restroomData collection. It uses
+     * the restroom objects UID in order to access the data.
+     */
     private void getOtherRestroomData() {
         DocumentReference docRef = db.collection("restroomData").document(rUID);
         docRef.get()
@@ -103,6 +113,7 @@ public class RestroomPage extends AppCompatActivity
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()){
+                            //Adds the additional data to the object and updates the UI
                             DocumentSnapshot document = task.getResult();
                             restroom.setOtherData(document.getData());
                             updateUI();
@@ -111,6 +122,12 @@ public class RestroomPage extends AppCompatActivity
                 });
     }
 
+    /**
+     * updateUI:
+     *
+     * This method updates the UI of the restroom page and is called after the additional data
+     * for the restroom is retrieved from the database.
+     */
     private void updateUI() {
         //Sets the content view and initializes the toolbar
         setContentView(R.layout.drawer_restroom);
@@ -124,21 +141,15 @@ public class RestroomPage extends AppCompatActivity
         ImagePagerAdapter adapter = new ImagePagerAdapter(this);
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
+            //Updates the indicator when the image is scrolled.
             @Override
             public void onPageSelected(int position) {
                 TextView indicator = findViewById(R.id.pagerIndicator);
                 indicator.setText(((position+1)+ " of " + viewPager.getAdapter().getCount()));
             }
 
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
+            @Override public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
+            @Override public void onPageScrollStateChanged(int state) { }
         });
 
         //Indicator Textview that displays x of y on the photos
@@ -171,23 +182,29 @@ public class RestroomPage extends AppCompatActivity
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
         //Sets the title of the restroom
         TextView title = findViewById(R.id.restroomName);
         title.setText(restroom.getName());
 
+        //Adds an onClickListener to the ratings button to display the ratings
         Button ratingBtn = (Button) findViewById(R.id.ratingsButton);
         ratingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                displayRatings();
+                toggleReviews();
             }
         });
     }
 
-    private void displayRatings() {
+    /**
+     * toggleReviews:
+     *
+     * This method is used to display or hide the ratings for the restroom.
+     */
+    private void toggleReviews() {
         final LinearLayout reviews = (LinearLayout) findViewById(R.id.reviews);
+
+        //Checks if the reviews have been downloaded from the database, and if not downloads them
         if (!downloadedReviews) {
             db.collection("reviews").document(restroom.getUID()).collection("reviews")
                     .get()
@@ -195,19 +212,24 @@ public class RestroomPage extends AppCompatActivity
                         @Override
                         public void onComplete(@NonNull Task<QuerySnapshot> task) {
                             if (task.isSuccessful()) {
+                                //Creates each review and adds them to the layout
                                 for (QueryDocumentSnapshot document : task.getResult()) {
                                     Review rev = new Review(document.getData());
                                     createReviewLayout(rev, reviews);
                                 }
+
+                                //Creates the hide button and adds the onClickListener
                                 Button hidebtn = new Button(RestroomPage.this);
                                 hidebtn.setText("Hide Reviews");
                                 hidebtn.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
-                                        displayRatings();
+                                        toggleReviews();
                                     }
                                 });
                                 hidebtn.setId(hideID);
+
+                                //Changes the visibility of the rating button and the review layout
                                 Button btn = (Button) findViewById(R.id.ratingsButton);
                                 btn.setVisibility(View.GONE);
                                 reviews.addView(hidebtn);
@@ -219,6 +241,7 @@ public class RestroomPage extends AppCompatActivity
                     });
             downloadedReviews=true;
         }
+        //If the reviews have already been downloaded it changes the visibility of the layout
         else{
             Button btn = (Button) findViewById(R.id.ratingsButton);
             Button hidebtn = (Button) findViewById(hideID);
@@ -235,10 +258,21 @@ public class RestroomPage extends AppCompatActivity
         }
     }
 
+    /**
+     * createReviewLayout:
+     *
+     * This method creates the layout for the review and adds it to the layout that was passed in.
+     *
+     * @param rev   The review to be displayed
+     * @param reviews   The layout to add the review to
+     */
     private void createReviewLayout(Review rev, LinearLayout reviews) {
+        //Creates a text view for the username
         TextView user = new TextView(RestroomPage.this);
         user.setText(rev.getReviewer()+ ":");
         reviews.addView(user);
+
+        //Creates the ratingBar and sets its value
         RatingBar rating = new RatingBar(RestroomPage.this);
         ViewGroup.LayoutParams params = reviews.getLayoutParams();
         params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
@@ -248,6 +282,8 @@ public class RestroomPage extends AppCompatActivity
         rating.setRating((float) rev.getRating());
         rating.setIsIndicator(true);
         reviews.addView(rating);
+
+        //Creates a textview for the review text.
         TextView review = new TextView(RestroomPage.this);
         review.setText(rev.getReview());
         reviews.addView(review);
@@ -319,8 +355,6 @@ public class RestroomPage extends AppCompatActivity
      * @param item The item that was selected and initiated the method call.
      * @return A boolean based on whether the method executed successfully
      */
-    @SuppressLint("MissingPermission")
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Gets the id of the item selected
