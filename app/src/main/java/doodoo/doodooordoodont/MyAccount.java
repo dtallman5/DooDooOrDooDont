@@ -39,6 +39,9 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 
 /**
  * Created by David on 4/5/2018.
+ *
+ * This Activity is for the user to see their account information and to preform different actions
+ * related to their account. This is the page that replaces the login page.
  */
 
 public class MyAccount extends Activity {
@@ -62,48 +65,41 @@ public class MyAccount extends Activity {
         textView.setText("Sign In with Google");
 
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-
-            }
-
-            @Override
-            public void onCancel() {
-
-            }
-
-            @Override
-            public void onError(FacebookException e) {
-
-            }
+            @Override public void onSuccess(LoginResult loginResult) { }
+            @Override public void onCancel() { }
+            @Override public void onError(FacebookException e) { }
         });
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 
-        final Button logout = (Button)findViewById(R.id.logout_button);
+        //Adds onClick to logout the user and sends user to the login screen
+        final Button logout = findViewById(R.id.logout_button);
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 FirebaseAuth.getInstance().signOut();
                 Toast.makeText(MyAccount.this,"Successfully signed out.",
                         Toast.LENGTH_SHORT).show();
-                Intent toHome = new Intent(MyAccount.this, LoginActivity.class);
-                startActivity(toHome);
+                Intent toLogin = new Intent(MyAccount.this, LoginActivity.class);
+                startActivity(toLogin);
             }
         });
 
-        final Button deleteAccount = (Button)findViewById(R.id.delete_button);
+        //Adds onClick to prompt the user and confirm deletion of account
+        final Button deleteAccount = findViewById(R.id.delete_button);
         deleteAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                reauthUser();
+                reauthUser();   //Reauthorizes the user if necessary
 
-                AlertDialog.Builder builder1 = new AlertDialog.Builder(MyAccount.this);
-                builder1.setMessage("Are you sure you wish to delete account?");
-                builder1.setCancelable(true);
+                //Creates the alert dialog
+                AlertDialog.Builder alert = new AlertDialog.Builder(MyAccount.this);
+                alert.setMessage("Are you sure you wish to delete account?");
+                alert.setCancelable(true);
 
-                builder1.setPositiveButton(
+                //If yes is selected it deletes the user from database
+                alert.setPositiveButton(
                         "Yes",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
@@ -111,8 +107,8 @@ public class MyAccount extends Activity {
                                 dialog.cancel();
                             }
                         });
-
-                builder1.setNegativeButton(
+                //If no is slected it cancels the dialog
+                alert.setNegativeButton(
                         "No",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
@@ -120,23 +116,27 @@ public class MyAccount extends Activity {
                             }
                         });
 
-                AlertDialog alert11 = builder1.create();
-                alert11.show();
+                alert.show();
             }
         });
     }
 
+    /**
+     * reauthUser:
+     *
+     * This method is used to reauthorize the user.
+     */
     private void reauthUser() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
+        //Creates an alert to prompt for the user to reenter their password
         AlertDialog.Builder alert = new AlertDialog.Builder(MyAccount.this);
         final EditText edittext = new EditText(MyAccount.this);
         alert.setMessage("Please Re-enter your Password");
         alert.setTitle("Password Check");
-
         alert.setView(edittext);
 
-        alert.setPositiveButton("Yes Option", new DialogInterface.OnClickListener() {
+        alert.setPositiveButton("Go", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 AuthCredential cred = EmailAuthProvider.getCredential(user.getEmail(),edittext.getText().toString());
@@ -149,23 +149,23 @@ public class MyAccount extends Activity {
             }
         });
 
-        alert.setNegativeButton("No Option", new DialogInterface.OnClickListener() {
+        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 // what ever you want to do with No option.
             }
         });
 
         alert.show();
-
-        AuthCredential cred = EmailAuthProvider.getCredential(user.getEmail(),"password");
-        user.reauthenticate(cred).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                Log.d(TAG, "User re-authenticated");
-            }
-        });
     }
 
+
+    /**
+     * onStart
+     *
+     * This method is run everytime the activity is started, even if it has already been created.
+     * If this activity starts through an intent, this method is still called. It is used here to
+     * grab the users information and populate the fields on screen.
+     */
     @Override
     public void onStart(){
         super.onStart();

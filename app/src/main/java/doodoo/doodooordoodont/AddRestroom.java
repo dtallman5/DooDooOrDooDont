@@ -168,7 +168,6 @@ public class AddRestroom extends AppCompatActivity implements TextWatcher{
                         Log.w(TAG, "Error adding document", e);
                     }
                 });
-        //db.collection("restroomData").document(toAdd.getUID()).set(toAdd.extractData());
         Intent backHome = new Intent(this,MainActivity.class);
         startActivity(backHome);
     }

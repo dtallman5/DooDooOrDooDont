@@ -12,10 +12,12 @@
         android:layout_height="wrap_content"
         android:text="Email:"
         android:textColor="@android:color/black"
-        android:layout_alignLeft="@id/emailAddress"/>
+        android:layout_alignStart="@id/emailAddress"/>
 
     <EditText
         android:id="@+id/emailAddress"
+        android:importantForAutofill="no"
+        android:hint="example@gmail.com"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
@@ -29,7 +31,7 @@
         android:id="@+id/textView11"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@id/password"
+        android:layout_alignStart="@id/password"
         android:layout_below="@id/emailAddress"
         android:text="Password:"
         android:textColor="@android:color/black" />
@@ -55,21 +57,11 @@
         android:layout_centerInParent="true"
         />
 
-    <Button
-        android:id="@+id/logout_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Sign Out"
-        android:layout_below="@id/login_button"
-        android:paddingTop="@dimen/padding_medium"
-        android:layout_centerInParent="true"
-        />
-
     <com.facebook.login.widget.LoginButton
         android:id="@+id/facebook_login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/logout_button"
+        android:layout_below="@id/login_button"
         android:paddingTop="@dimen/padding_medium"
         android:layout_centerInParent="true"/>
 
@@ -90,15 +82,4 @@
         android:paddingTop="@dimen/padding_large"
         android:layout_centerInParent="true"
         />
-
-    <Button
-        android:id="@+id/delete_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Delete Account"
-        android:layout_below="@id/create_button"
-        android:paddingTop="@dimen/padding_large"
-        android:layout_centerInParent="true"
-        />
-
 </RelativeLayout>

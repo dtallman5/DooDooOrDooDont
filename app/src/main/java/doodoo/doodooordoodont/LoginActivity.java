@@ -65,7 +65,7 @@ public class LoginActivity extends Activity {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         //Adds an OnEditorActionListener to listen for the Done button and login the user
-        EditText password = (EditText) findViewById(R.id.password);
+        EditText password = findViewById(R.id.password);
         password.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
@@ -89,27 +89,16 @@ public class LoginActivity extends Activity {
         //Not used code for registering a callback of the facebook button
         loginButton = findViewById(R.id.facebook_login);
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-
-            }
-
-            @Override
-            public void onCancel() {
-
-            }
-
-            @Override
-            public void onError(FacebookException e) {
-
-            }
+            @Override public void onSuccess(LoginResult loginResult) {            }
+            @Override public void onCancel() {            }
+            @Override public void onError(FacebookException e) {            }
         });
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 
         //Adds the Createaccount dialog to the buttons onclicklistener
-        final Button createAccount = (Button)findViewById(R.id.create_button);
+        final Button createAccount = findViewById(R.id.create_button);
         createAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -153,7 +142,7 @@ public class LoginActivity extends Activity {
         });
 
         //Adds onClick to login button to validate the entries and attempt to sign in user
-        final Button login = (Button)findViewById(R.id.login_button);
+        final Button login = findViewById(R.id.login_button);
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -166,122 +155,32 @@ public class LoginActivity extends Activity {
 
 
         });
-
-        //Adds onClick to logout the user and sends user to the login screen
-        final Button logout = (Button)findViewById(R.id.logout_button);
-        logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FirebaseAuth.getInstance().signOut();
-                Toast.makeText(LoginActivity.this,"Successfully signed out.",
-                        Toast.LENGTH_SHORT).show();
-                Intent toLogin = new Intent(LoginActivity.this, MainActivity.class);
-                startActivity(toLogin);
-            }
-        });
-
-        //Adds onClick to prompt the user and confirm deletion of account
-        final Button deleteAccount = (Button)findViewById(R.id.delete_button);
-        deleteAccount.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                reauthUser();   //Reauthorizes the user if necessary
-
-                //Creates the alert dialog
-                AlertDialog.Builder alert = new AlertDialog.Builder(LoginActivity.this);
-                alert.setMessage("Are you sure you wish to delete account?");
-                alert.setCancelable(true);
-
-                //If yes is selected it deletes the user from database
-                alert.setPositiveButton(
-                        "Yes",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                FirebaseAuth.getInstance().getCurrentUser().delete();
-                                dialog.cancel();
-                            }
-                        });
-                //If no is slected it cancels the dialog
-                alert.setNegativeButton(
-                        "No",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                            }
-                        });
-
-                alert.show();
-            }
-        });
     }
 
-    private void reauthUser() {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-        AlertDialog.Builder alert = new AlertDialog.Builder(LoginActivity.this);
-        final EditText edittext = new EditText(LoginActivity.this);
-        alert.setMessage("Please Re-enter your Password");
-        alert.setTitle("Password Check");
-
-        alert.setView(edittext);
-
-        alert.setPositiveButton("Yes Option", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                AuthCredential cred = EmailAuthProvider.getCredential(user.getEmail(),edittext.getText().toString());
-                user.reauthenticate(cred).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        Log.d(TAG, "User re-authenticated");
-                    }
-                });
-            }
-        });
-
-        alert.setNegativeButton("No Option", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                // what ever you want to do with No option.
-            }
-        });
-
-        alert.show();
-
-        AuthCredential cred = EmailAuthProvider.getCredential(user.getEmail(),"password");
-        user.reauthenticate(cred).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                Log.d(TAG, "User re-authenticated");
-            }
-        });
-    }
-
+    /**
+     * onStart
+     *
+     * This method is run everytime the activity is started, even if it has already been created.
+     * If this activity starts through an intent, this method is still called.
+     */
     @Override
     public void onStart(){
         super.onStart();
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) {
-            // Name, email address, and profile photo Url
-            String name = user.getDisplayName();
-            String email = user.getEmail();
-            ((TextView) findViewById(R.id.emailAddress)).setText(email);
-            Uri photoUrl = user.getPhotoUrl();
-            // Check if user's email is verified
-            boolean emailVerified = user.isEmailVerified();
-
-            // The user's ID, unique to the Firebase project. Do NOT use this value to
-            // authenticate with your backend server, if you have one. Use
-            // FirebaseUser.getIdToken() instead.
-            String uid = user.getUid();
-        }
-
     }
 
+    /**
+     * createAccount:
+     *
+     * This method creates an account for the database using the specified username, password, and
+     * email.
+     *
+     * @param username Username for the account
+     * @param password Password for the account
+     * @param email email for the account
+     */
     private void createAccount(String username, String password, String email) {
         Log.d(TAG, "createAccount:" + email);
-        mAuth.signOut();
+        mAuth.signOut(); //Signs out the anonymous user
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -304,8 +203,9 @@ public class LoginActivity extends Activity {
                 .setDisplayName(username)
                 .build();
 
-        while (mAuth.getCurrentUser() == null){}
+        while (mAuth.getCurrentUser() == null){} //Waits for the user to be created
 
+        //Updates the user profile with the username
         mAuth.getCurrentUser().updateProfile(profileUpdates)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -317,13 +217,24 @@ public class LoginActivity extends Activity {
                 });
     }
 
+    /**
+     * signIn
+     *
+     * This method checks to make sure that the fields have been filled out, and if so it attempts
+     * to log the user in using the specified credentials
+     *
+     * @param email The user entered email
+     * @param password The user entered password
+     */
     private void signIn(String email, String password) {
         Log.d(TAG, "signIn:" + email);
+
+        //Checks to make sure the fields are filled out
         if (!validateForm()) {
             return;
         }
 
-        // [START sign_in_with_email]
+        //Attampts to log the user in using the email and password
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -333,6 +244,8 @@ public class LoginActivity extends Activity {
                             Log.d(TAG, "signInWithEmail:success");
                             Toast.makeText(LoginActivity.this,"Successfully logged in.",
                                     Toast.LENGTH_SHORT).show();
+
+                            //Send the user back to the home screen
                             Intent toHome = new Intent(LoginActivity.this,MainActivity.class);
                             startActivity(toHome);
                         } else {
@@ -343,14 +256,22 @@ public class LoginActivity extends Activity {
                         }
                     }
                 });
-        // [END sign_in_with_email]
     }
 
+    /**
+     * validateForm:
+     *
+     * This method checks the emailAddress and password field to make sure that the user has filled
+     * them out.
+     *
+     * @return Returns a boolean depending on whether it was filled out or not
+     */
     private boolean validateForm() {
         boolean valid = true;
-        TextView mEmailField = (TextView)findViewById(R.id.emailAddress);
-        TextView mPasswordField = (TextView)findViewById(R.id.password);
+        TextView mEmailField = findViewById(R.id.emailAddress);
+        TextView mPasswordField = findViewById(R.id.password);
 
+        //Checks the email field, and sets and error if it is empty
         String email = mEmailField.getText().toString();
         if (TextUtils.isEmpty(email)) {
             mEmailField.setError("Required.");
@@ -359,6 +280,7 @@ public class LoginActivity extends Activity {
             mEmailField.setError(null);
         }
 
+        //Checks the password field, and sets an error if it is empty
         String password = mPasswordField.getText().toString();
         if (TextUtils.isEmpty(password)) {
             mPasswordField.setError("Required.");

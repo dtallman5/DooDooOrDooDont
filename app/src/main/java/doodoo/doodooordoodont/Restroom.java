@@ -18,9 +18,8 @@ import java.util.Map;
  */
 
 public class Restroom {
-    private String UID;
-
-    private String name;
+    private String UID; //The uid used by the database
+    private String name; //The name of the bathroom
 
     private double mAvgRating;
     private int mNumRatings;
@@ -32,11 +31,10 @@ public class Restroom {
     private FirebaseFirestore db;
     private static String TAG = "Restroom";
 
-    public static boolean menDisplayed;
+    private static boolean menDisplayed;
 
     public Restroom(){
         menDisplayed=true;
-
     }
 
     public Restroom(String UID,boolean marker) {
@@ -79,6 +77,8 @@ public class Restroom {
     }
 
     private void setMarkerData(Map map){
+        if (map == null) { return; }
+
         name = (String) map.get("name");
         mAvgRating = (double) map.get("mAvgRating");
         mNumRatings = (int) ((long) map.get("mNumRatings"));
