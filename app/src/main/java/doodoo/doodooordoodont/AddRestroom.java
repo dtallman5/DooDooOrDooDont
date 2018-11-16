@@ -21,8 +21,13 @@ import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /*
@@ -171,6 +176,22 @@ public class AddRestroom extends AppCompatActivity implements TextWatcher{
         Intent backHome = new Intent(this,MainActivity.class);
         startActivity(backHome);
     }
+
+    /*
+    private void saveBaseData(){
+        Map<String, Object> map  = new HashMap<>();
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+
+        map.put("name", name);
+        map.put("mAvgRating", mAvgRating);
+        map.put("mNumRatings", mNumRatings);
+        map.put("fAvgRating", fAvgRating);
+        map.put("fNumRatings", fNumRatings);
+        map.put("lat",lat);
+        map.put("lon",lon);
+    }*/
 
     /**
      * onOptionsItemSelected

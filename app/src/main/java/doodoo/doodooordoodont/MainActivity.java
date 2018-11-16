@@ -41,6 +41,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -52,6 +53,7 @@ public class MainActivity extends AppCompatActivity
     private Context context;
     private FusedLocationProviderClient mFusedLocationClient;
     private FirebaseAuth mAuth;
+    protected static User currUser;
 
 
     private FirebaseFirestore db;
@@ -170,6 +172,13 @@ public class MainActivity extends AppCompatActivity
             navigationView.inflateMenu(R.menu.activity_main_drawer_loggedin);
             ((TextView) headerView.findViewById(R.id.username)).setText(user.getDisplayName());
             ((TextView) headerView.findViewById(R.id.userEmail)).setText(user.getEmail());
+            /* Collects user info from the database
+            db.collection("users").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    currUser = new User(task.getResult().getData());
+                }
+            });*/
         }
 
         //Updates the map after changing the navigation header
@@ -236,6 +245,11 @@ public class MainActivity extends AppCompatActivity
 
         //Checks which item was selected and handles the appropriate action
         if (id == R.id.nav_add_restroom) {
+            if (FirebaseAuth.getInstance().getCurrentUser().isAnonymous())
+            {
+                Toast.makeText(this, "Must be logged in to Add Restroom", Toast.LENGTH_LONG).show();
+                return true;
+            }
             drawer.closeDrawer(GravityCompat.START);
             nextScreen = new Intent(this, AddRestroom.class);
             //Gets the user's location and sends that to the AddRestroom class

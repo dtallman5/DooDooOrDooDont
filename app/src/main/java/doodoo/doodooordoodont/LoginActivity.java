@@ -292,6 +292,11 @@ public class LoginActivity extends Activity {
         return valid;
     }
 
+    public void onBackPressed() {
+        Intent toHome = new Intent(this, MainActivity.class);
+        startActivity(toHome);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         callbackManager.onActivityResult(requestCode, resultCode, data);
