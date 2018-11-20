@@ -15,15 +15,18 @@ public class User {
     private int numReviews;
     private String userId;
     private String gender;
+    private String email;
 
     public User(Map<String,Object> map) {
         name = (String) map.get("name");
-        numReviews = (int) map.get("numReviews");
+        numReviews = (int) ((long) map.get("numReviews"));
         userId = (String) map.get("userId");
         gender = (String) map.get("gender");
+        email = (String) map.get("email");
     }
 
 
+    public String getEmail() { return email; }
 
     public Image getPic() {
         return pic;

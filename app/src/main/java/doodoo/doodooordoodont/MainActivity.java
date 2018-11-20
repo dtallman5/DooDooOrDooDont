@@ -168,17 +168,20 @@ public class MainActivity extends AppCompatActivity
         }
         //If the user is not anonymous, set the info to their info
         else {
-            navigationView.getMenu().clear();
-            navigationView.inflateMenu(R.menu.activity_main_drawer_loggedin);
-            ((TextView) headerView.findViewById(R.id.username)).setText(user.getDisplayName());
-            ((TextView) headerView.findViewById(R.id.userEmail)).setText(user.getEmail());
-            /* Collects user info from the database
+             //TODO Collects user info from the database
             db.collection("users").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                     currUser = new User(task.getResult().getData());
+                    NavigationView navigationView = findViewById(R.id.nav_view);
+                    View headerView = navigationView.getHeaderView(0);
+
+                    navigationView.getMenu().clear();
+                    navigationView.inflateMenu(R.menu.activity_main_drawer_loggedin);
+                    ((TextView) headerView.findViewById(R.id.username)).setText(currUser.getName());
+                    ((TextView) headerView.findViewById(R.id.userEmail)).setText(currUser.getEmail());
                 }
-            });*/
+            });
         }
 
         //Updates the map after changing the navigation header

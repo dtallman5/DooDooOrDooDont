@@ -37,6 +37,10 @@ import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by David on 4/5/2018.
@@ -47,6 +51,7 @@ public class LoginActivity extends Activity {
     private CallbackManager callbackManager;
     GoogleSignInClient mGoogleSignInClient;
     private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
     private static final String TAG = "LoginActivity";
 
     @Override
@@ -96,6 +101,7 @@ public class LoginActivity extends Activity {
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         //Adds the Createaccount dialog to the buttons onclicklistener
         final Button createAccount = findViewById(R.id.create_button);
@@ -125,15 +131,21 @@ public class LoginActivity extends Activity {
                 email.setHint("Email");
                 email.setWidth(layout.getWidth());
 
+                //gender field
+                final EditText gender = new EditText(LoginActivity.this);
+                gender.setHint("Gender");
+                gender.setWidth(layout.getWidth());
+
                 layout.addView(username);
                 layout.addView(pass);       //Adds field to layout
                 layout.addView(email);
+                layout.addView(gender);
                 alert.setView(layout);
 
                 //Sets the positive button to call create account with the fields
                 alert.setPositiveButton("Create Account", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        createAccount(username.getText().toString(),pass.getText().toString(),email.getText().toString());
+                        createAccount(username.getText().toString(),pass.getText().toString(),email.getText().toString(),gender.getText().toString());
                     }
                 });
                 alert.show();
@@ -178,7 +190,7 @@ public class LoginActivity extends Activity {
      * @param password Password for the account
      * @param email email for the account
      */
-    private void createAccount(String username, String password, String email) {
+    private void createAccount(final String username, String password, final String email, final String gender) {
         Log.d(TAG, "createAccount:" + email);
         mAuth.signOut(); //Signs out the anonymous user
         mAuth.createUserWithEmailAndPassword(email, password)
@@ -189,6 +201,7 @@ public class LoginActivity extends Activity {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "createUserWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
+                            saveUserData(email, username, gender, user.getUid());
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
@@ -197,24 +210,26 @@ public class LoginActivity extends Activity {
                         }
                     }
                 });
+    }
 
-
-        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                .setDisplayName(username)
-                .build();
-
-        while (mAuth.getCurrentUser() == null){} //Waits for the user to be created
-
-        //Updates the user profile with the username
-        mAuth.getCurrentUser().updateProfile(profileUpdates)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, "User profile updated.");
-                        }
-                    }
-                });
+    private void saveUserData(String email, String username, String gender, String uid) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("email", email);
+        map.put("name",username);
+        map.put("numReviews",0);
+        map.put("gender", gender);
+        map.put("userId", mAuth.getUid());
+        db.collection("users").document(mAuth.getUid()).set(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    Log.d(TAG, "User profile stored.");
+                }
+                else {
+                    Log.d(TAG, "User profile not stored.");
+                }
+            }
+        });
     }
 
     /**

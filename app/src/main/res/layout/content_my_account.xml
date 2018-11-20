@@ -11,24 +11,43 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Username:"
-        android:textColor="@android:color/black"
-        android:layout_alignLeft="@id/emailAddress"/>
+        android:textColor="@android:color/black" />
 
     <TextView
         android:id="@+id/email"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@id/password"
         android:layout_below="@id/username"
         android:text="Email:"
         android:textColor="@android:color/black" />
+
+    <TextView
+        android:id="@+id/numreviews"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/email"
+        android:textColor="@android:color/black"/>
+
+    <TextView
+        android:id="@+id/userid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/numreviews"
+        android:textColor="@android:color/black"/>
+
+    <TextView
+        android:id="@+id/gender"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/userid"
+        android:textColor="@android:color/black"/>
 
     <Button
         android:id="@+id/logout_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Sign Out"
-        android:layout_below="@id/email"
+        android:layout_below="@id/gender"
         android:paddingTop="@dimen/padding_medium"
         android:layout_centerInParent="true"
         />

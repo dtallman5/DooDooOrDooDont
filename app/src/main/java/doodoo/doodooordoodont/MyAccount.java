@@ -50,6 +50,7 @@ public class MyAccount extends Activity {
     GoogleSignInClient mGoogleSignInClient;
     private FirebaseAuth mAuth;
     private static final String TAG = "LoginActivity";
+    private User currUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +59,7 @@ public class MyAccount extends Activity {
         FacebookSdk.sdkInitialize(getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
 
+        currUser = MainActivity.currUser;
 
         setContentView(R.layout.content_my_account);
         loginButton = findViewById(R.id.facebook_login);
@@ -172,19 +174,16 @@ public class MyAccount extends Activity {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        String name = user.getDisplayName();
-        String email = user.getEmail();
-        ((TextView) findViewById(R.id.username)).setText("Username: " + name);
-        ((TextView) findViewById(R.id.email)).setText("Email: " + email);
+
+        ((TextView) findViewById(R.id.username)).setText("Username: " + currUser.getName());
+        ((TextView) findViewById(R.id.email)).setText("Email: " + currUser.getEmail());
+        ((TextView) findViewById(R.id.numreviews)).setText("NumRevies: " + currUser.getNumReviews());
+        ((TextView) findViewById(R.id.userid)).setText("UserID: " + currUser.getUserId());
+        ((TextView) findViewById(R.id.gender)).setText("Gender: " + currUser.getGender());
+
         Uri photoUrl = user.getPhotoUrl();
         // Check if user's email is verified
         boolean emailVerified = user.isEmailVerified();
-
-        // The user's ID, unique to the Firebase project. Do NOT use this value to
-        // authenticate with your backend server, if you have one. Use
-        // FirebaseUser.getIdToken() instead.
-        String uid = user.getUid();
-
 
     }
 
