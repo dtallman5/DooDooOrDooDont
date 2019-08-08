@@ -1,26 +1,35 @@
 package doodoo.doodooordoodont;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created by David on 4/3/2018.
  */
 
-public class Review {
-
+public class Rating {
+    private String UID; //The uid used by the database
     private Date date;
     private double rating;
     private String reviewer;
     private String review;
     private int[] reactions;
 
+    public String getUID() {
+        return UID;
+    }
 
-    public Review(Date date, String user, double rating, String review){
+    public void setUID(String UID) {
+        this.UID = UID;
+    }
+
+    public Rating(Date date, String user, double rating, String review){
         this.date = date;
         this.reviewer = user;
         this.rating = rating;
         this.review = review;
+        reactions = new int[]{0,0,0};
     }
 
     public Date getDate() { return date; }
@@ -31,12 +40,30 @@ public class Review {
 
     public String getReview() { return review; }
 
-    public Review (Map map){
+    public Rating(Map map){
         this.date = (Date) map.get("date");
         this.reviewer = (String) map.get("user");
         this.rating =  (double) map.get("rating");
         this.review = (String) map.get("review");
+        int useful = (int) map.get("useful");
+        int funny = (int) map.get("funny");
+        int cool = (int) map.get("cool");
+        this.reactions = new int[]{useful, funny, cool};
+    }
 
+    public Map toMap() {
+
+        Map<String, Object> map  = new HashMap<>();
+
+        map.put("date", date);
+        map.put("rating", rating);
+        map.put("reviewer", reviewer);
+        map.put("review", review);
+        map.put("useful", reactions[0]);
+        map.put("funny", reactions[1]);
+        map.put("cool", reactions[2]);
+
+        return map;
     }
 
 

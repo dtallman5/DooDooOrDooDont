@@ -24,6 +24,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.Date;
+
 
 /*
  * Created by David on 3/11/2018.
@@ -35,15 +37,16 @@ import com.google.firebase.firestore.FirebaseFirestore;
  * object from the information provided. Should eventually add the restroom to the database
  * rather than putting it in an intent and sending back to main activity.
  */
-public class AddRestroom extends AppCompatActivity implements TextWatcher{
+public class AddRating extends AppCompatActivity implements TextWatcher{
 
     private Button send;       //The button in the toolbar
     private RadioGroup gender; //The Radio Group for bathroom gender
-    private EditText name;     //The edit text field for the bathroom name
+    private EditText review;     //The edit text field for the bathroom review
     private RatingBar ratings; //The rating bar
     double lon, lat;           //Variables to hold the user's location when add restroom initiated
     private FirebaseFirestore db;
-    private static final String TAG = "AddRestroom";
+    private User user;
+    private static final String TAG = "AddRating";
 
 
     /**
@@ -60,15 +63,13 @@ public class AddRestroom extends AppCompatActivity implements TextWatcher{
 
         //Uses the activity's intent in order to get the user's location
         db = FirebaseFirestore.getInstance();
-        Intent in = this.getIntent();
-        lon = in.getDoubleExtra("Lon",0);
-        lat = in.getDoubleExtra("Lat", 0);
 
+        user = MainActivity.currUser;
 
         //Sets the content view and initializes the toolbar
-        setContentView(R.layout.content_add_restroom);
+        setContentView(R.layout.content_add_rating);
         Toolbar toolbar = findViewById(R.id.addtoolbar);
-        toolbar.setTitle("Add Restroom");
+        toolbar.setTitle("Add Rating");
         setSupportActionBar(toolbar);
 
         //Saves the rating bar to a variable
@@ -82,7 +83,7 @@ public class AddRestroom extends AppCompatActivity implements TextWatcher{
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                createRestroom();
+                createRating();
             }
         });
 
@@ -91,9 +92,9 @@ public class AddRestroom extends AppCompatActivity implements TextWatcher{
         String coordinateText = "Coordinates:  " + lat + ", " + lon;
         coord.setText(coordinateText);
 
-        //Adds a text Changed listener to the name field to check for when it is filled in
-        name = findViewById(R.id.review);
-        name.addTextChangedListener(this);
+        //Adds a text Changed listener to the review field to check for when it is filled in
+        review = findViewById(R.id.review);
+        review.addTextChangedListener(this);
 
         //Adds a checkedChangeListener to see when a radio button is selected
         gender = findViewById(R.id.genderGroup);
@@ -144,14 +145,9 @@ public class AddRestroom extends AppCompatActivity implements TextWatcher{
      * This method is called by the send button's onClickListener and creates the new Restroom.
      *
      */
-    private void createRestroom() {
+    private void createRating() {
         //TODO need to make the restroom other data and restroom ratings be stored differently
-        final Restroom toAdd = new Restroom();
-        toAdd.setName( name.getText().toString());
-        toAdd.setRatings(ratings.getRating(),1,ratings.getRating(),1);
-        toAdd.setLocation(lat, lon);
-        String numStalls = (String)((Spinner)findViewById(R.id.stallSpinner)).getSelectedItem();
-        toAdd.setfNumStalls(numStalls);
+        final Rating toAdd = new Rating(new Date(), user.getUserId(),ratings.getRating(), review.getText().toString());
         db.collection("restrooms")
                 .add(toAdd.toMap())
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -159,7 +155,6 @@ public class AddRestroom extends AppCompatActivity implements TextWatcher{
                     public void onSuccess(DocumentReference documentReference) {
                         Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
                         toAdd.setUID(documentReference.getId());
-                        db.collection("restroomData").document(toAdd.getUID()).set(toAdd.extractData());
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -179,7 +174,7 @@ public class AddRestroom extends AppCompatActivity implements TextWatcher{
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
 
-        map.put("name", name);
+        map.put("review", review);
         map.put("mAvgRating", mAvgRating);
         map.put("mNumRatings", mNumRatings);
         map.put("fAvgRating", fAvgRating);
@@ -214,11 +209,11 @@ public class AddRestroom extends AppCompatActivity implements TextWatcher{
      * checkFields
      *
      * This method checks to make sure that the required fields are filled in. It is called during
-     * an update from the name field or the radio buttons and it alters the appearance and the
+     * an update from the review field or the radio buttons and it alters the appearance and the
      * clickability of the send button
      */
     public void checkFields(){
-        if (!name.getText().toString().equals("") && gender.getCheckedRadioButtonId() != -1){
+        if (!review.getText().toString().equals("") && gender.getCheckedRadioButtonId() != -1){
             send.setTextColor(getResources().getColor(R.color.colorWhite));
             send.setAlpha(1f);
             send.setClickable(true);

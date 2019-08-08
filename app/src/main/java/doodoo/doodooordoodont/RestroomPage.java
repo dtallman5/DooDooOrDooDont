@@ -194,6 +194,27 @@ public class RestroomPage extends AppCompatActivity
                 toggleReviews();
             }
         });
+
+        if (MainActivity.currUser != null){
+            Button addRating = (Button) findViewById(R.id.addRating);
+            addRating.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    addRating();
+                }
+            });
+        }
+    }
+
+    /**
+     * toggleReviews:
+     *
+     * This method is used to add a review to the restroom.
+     */
+    private void addRating() {
+        final Intent nextScreen;
+        nextScreen = new Intent(this, AddRating.class);
+        startActivity(nextScreen);
     }
 
     /**
@@ -214,7 +235,7 @@ public class RestroomPage extends AppCompatActivity
                             if (task.isSuccessful()) {
                                 //Creates each review and adds them to the layout
                                 for (QueryDocumentSnapshot document : task.getResult()) {
-                                    Review rev = new Review(document.getData());
+                                    Rating rev = new Rating(document.getData());
                                     createReviewLayout(rev, reviews);
                                 }
 
@@ -266,7 +287,7 @@ public class RestroomPage extends AppCompatActivity
      * @param rev   The review to be displayed
      * @param reviews   The layout to add the review to
      */
-    private void createReviewLayout(Review rev, LinearLayout reviews) {
+    private void createReviewLayout(Rating rev, LinearLayout reviews) {
         //Creates a text view for the username
         TextView user = new TextView(RestroomPage.this);
         user.setText(rev.getReviewer()+ ":");
