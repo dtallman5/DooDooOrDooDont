@@ -12,6 +12,7 @@ import java.util.Map;
 public class User {
     private Image pic;
     private String name;
+
     private int numReviews;
     private String userId;
     private String gender;
@@ -47,4 +48,6 @@ public class User {
     public String getGender() {
         return gender;
     }
+
+    public void setNumReviews(int numReviews) { this.numReviews = numReviews; }
 }

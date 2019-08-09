@@ -130,6 +130,7 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        currUser = null;
 
         //If there is no user at all, then it signs them in as an anonymous user
         if (user == null) {

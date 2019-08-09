@@ -83,7 +83,7 @@ public class Restroom {
         mAvgRating = (double) map.get("mAvgRating");
         mNumRatings = (int) ((long) map.get("mNumRatings"));
         fAvgRating = (double) map.get("fAvgRating");
-        fNumRatings = (int) ((long)map.get("fNumRatings"));
+        fNumRatings = (int) ((long) map.get("fNumRatings"));
         lat = (double) map.get("lat");
         lon = (double) map.get("lon");
         menDisplayed = true;
@@ -104,11 +104,11 @@ public class Restroom {
 
     public void setfNumStalls(String fNumStalls) { this.fNumStalls = fNumStalls; }
 
-    public void setRatings(float mAvgRating, int mNumRatings, float fAvgRating, int fNumRatings) {
+    public void setRatings(double mAvgRating, int mNumRatings, double fAvgRating, int fNumRatings) {
+
         this.fNumRatings = fNumRatings;
         this.fAvgRating = fAvgRating;
         this.mNumRatings = mNumRatings;
-
         this.mAvgRating = mAvgRating;
     }
 

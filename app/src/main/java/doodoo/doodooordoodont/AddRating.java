@@ -19,9 +19,12 @@ import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Date;
@@ -47,6 +50,9 @@ public class AddRating extends AppCompatActivity implements TextWatcher{
     private FirebaseFirestore db;
     private User user;
     private static final String TAG = "AddRating";
+    private String rUID;
+    private Rating toAdd;
+    Restroom toRate;
 
 
     /**
@@ -61,8 +67,25 @@ public class AddRating extends AppCompatActivity implements TextWatcher{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //Uses the activity's intent in order to get the user's location
+        //Uses the activity's intent in order to get the restrooms UID
+        Intent from = getIntent();
+        rUID = from.getStringExtra("restroomUID");
+
         db = FirebaseFirestore.getInstance();
+        DocumentReference docRef = db.collection("restrooms").document(rUID);
+        docRef.get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            //Creates the restroom object and then gets the additional info from the db
+                            DocumentSnapshot document = task.getResult();
+                            toRate = new Restroom(document.getId(), document.getData());
+                        } else {
+                            Log.w(TAG, "Error getting documents.", task.getException());
+                        }
+                    }
+                });
 
         user = MainActivity.currUser;
 
@@ -87,23 +110,10 @@ public class AddRating extends AppCompatActivity implements TextWatcher{
             }
         });
 
-        //Temporary!!! Used in order to make sure coordinates work correctly
-        TextView coord = findViewById(R.id.coordinateText);
-        String coordinateText = "Coordinates:  " + lat + ", " + lon;
-        coord.setText(coordinateText);
 
         //Adds a text Changed listener to the review field to check for when it is filled in
         review = findViewById(R.id.review);
         review.addTextChangedListener(this);
-
-        //Adds a checkedChangeListener to see when a radio button is selected
-        gender = findViewById(R.id.genderGroup);
-        gender.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup radioGroup, int i) {
-                checkFields();
-            }
-        });
 
         //Initializes the spinner for the number of stalls
         Spinner stallSpinner = findViewById(R.id.stallSpinner);
@@ -147,14 +157,16 @@ public class AddRating extends AppCompatActivity implements TextWatcher{
      */
     private void createRating() {
         //TODO need to make the restroom other data and restroom ratings be stored differently
-        final Rating toAdd = new Rating(new Date(), user.getUserId(),ratings.getRating(), review.getText().toString());
-        db.collection("restrooms")
+        toAdd = new Rating(new Date(), user.getUserId(),ratings.getRating(), review.getText().toString());
+        db.collection("reviews").document(rUID).collection("reviews")
                 .add(toAdd.toMap())
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
                         Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
                         toAdd.setUID(documentReference.getId());
+                        addRatingtoRestroom();
+                        addRatingtoUser();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -167,21 +179,39 @@ public class AddRating extends AppCompatActivity implements TextWatcher{
         startActivity(backHome);
     }
 
-    /*
-    private void saveBaseData(){
-        Map<String, Object> map  = new HashMap<>();
+    private void addRatingtoRestroom() {
+        int numRatings;
+        double avgRating;
+        if (user.getGender().equals("Male")) {
+            numRatings = toRate.getmNumRatings();
+            avgRating = toRate.getmAvgRating();
+            avgRating = ((avgRating*numRatings) + toAdd.getRating())/(numRatings+1);
+            numRatings++;
+            db.collection("restrooms").document(rUID).update("mAvgRating",avgRating);
+            db.collection("restrooms").document(rUID).update("mNumRatings",numRatings);
+        }
+        else if (user.getGender().equals("Female")){
+            numRatings = toRate.getfNumRatings();
+            avgRating = toRate.getfAvgRating();
+            avgRating = ((avgRating*numRatings) + toAdd.getRating())/(numRatings+1);
+            numRatings++;
+            db.collection("restrooms").document(rUID).update("fAvgRating",avgRating);
+            db.collection("restrooms").document(rUID).update("fNumRatings",numRatings);
+        }
+    }
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    private void addRatingtoUser() {
+        user.setNumReviews(user.getNumReviews() + 1);
+        String fullRatingID = toRate.getUID()+"_"+toAdd.getUID();
+        db.collection("users").document(user.getUserId()).collection("reviews")
+                .document(fullRatingID).set(toAdd.toUserMap()).addOnSuccessListener(new OnSuccessListener() {
+            @Override
+            public void onSuccess(Object o) {
 
-
-        map.put("review", review);
-        map.put("mAvgRating", mAvgRating);
-        map.put("mNumRatings", mNumRatings);
-        map.put("fAvgRating", fAvgRating);
-        map.put("fNumRatings", fNumRatings);
-        map.put("lat",lat);
-        map.put("lon",lon);
-    }*/
+            }
+        });
+        db.collection("users").document(user.getUserId()).update("numReviews",user.getNumReviews());
+    }
 
     /**
      * onOptionsItemSelected
@@ -213,7 +243,7 @@ public class AddRating extends AppCompatActivity implements TextWatcher{
      * clickability of the send button
      */
     public void checkFields(){
-        if (!review.getText().toString().equals("") && gender.getCheckedRadioButtonId() != -1){
+        if (!review.getText().toString().equals("")){
             send.setTextColor(getResources().getColor(R.color.colorWhite));
             send.setAlpha(1f);
             send.setClickable(true);

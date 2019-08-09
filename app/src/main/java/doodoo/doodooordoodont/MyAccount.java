@@ -177,7 +177,7 @@ public class MyAccount extends Activity {
 
         ((TextView) findViewById(R.id.username)).setText("Username: " + currUser.getName());
         ((TextView) findViewById(R.id.email)).setText("Email: " + currUser.getEmail());
-        ((TextView) findViewById(R.id.numreviews)).setText("NumRevies: " + currUser.getNumReviews());
+        ((TextView) findViewById(R.id.numreviews)).setText("NumReviews: " + currUser.getNumReviews());
         ((TextView) findViewById(R.id.userid)).setText("UserID: " + currUser.getUserId());
         ((TextView) findViewById(R.id.gender)).setText("Gender: " + currUser.getGender());
 

@@ -47,6 +47,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".AddRestroom"/>
+        <activity android:name=".AddRating"/>
         <activity android:name=".RestroomPage"/>
         <activity android:name=".MyAccount"/>
     </application>

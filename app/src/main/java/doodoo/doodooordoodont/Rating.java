@@ -45,9 +45,9 @@ public class Rating {
         this.reviewer = (String) map.get("user");
         this.rating =  (double) map.get("rating");
         this.review = (String) map.get("review");
-        int useful = (int) map.get("useful");
-        int funny = (int) map.get("funny");
-        int cool = (int) map.get("cool");
+        int useful = (int) ((long)map.get("useful"));
+        int funny = (int) ((long)map.get("funny"));
+        int cool = (int) ((long) map.get("cool"));
         this.reactions = new int[]{useful, funny, cool};
     }
 
@@ -59,6 +59,16 @@ public class Rating {
         map.put("rating", rating);
         map.put("reviewer", reviewer);
         map.put("review", review);
+        map.put("useful", reactions[0]);
+        map.put("funny", reactions[1]);
+        map.put("cool", reactions[2]);
+
+        return map;
+    }
+
+    public Map toUserMap(){
+        Map<String, Object> map  = new HashMap<>();
+
         map.put("useful", reactions[0]);
         map.put("funny", reactions[1]);
         map.put("cool", reactions[2]);

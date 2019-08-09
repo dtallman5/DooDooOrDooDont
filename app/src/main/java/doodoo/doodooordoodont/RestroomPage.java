@@ -197,6 +197,7 @@ public class RestroomPage extends AppCompatActivity
 
         if (MainActivity.currUser != null){
             Button addRating = (Button) findViewById(R.id.addRating);
+            addRating.setVisibility(View.VISIBLE);
             addRating.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -214,6 +215,7 @@ public class RestroomPage extends AppCompatActivity
     private void addRating() {
         final Intent nextScreen;
         nextScreen = new Intent(this, AddRating.class);
+        nextScreen.putExtra("restroomUID", restroom.getUID());
         startActivity(nextScreen);
     }
 
@@ -224,6 +226,11 @@ public class RestroomPage extends AppCompatActivity
      */
     private void toggleReviews() {
         final LinearLayout reviews = (LinearLayout) findViewById(R.id.reviews);
+        if (restroom.getmNumRatings() == 0){
+            Toast alert = Toast.makeText(this,"No Reviews to Display",Toast.LENGTH_LONG);
+            alert.show();
+            return;
+        }
 
         //Checks if the reviews have been downloaded from the database, and if not downloads them
         if (!downloadedReviews) {
