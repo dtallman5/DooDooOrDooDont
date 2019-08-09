@@ -172,22 +172,6 @@ public class AddRestroom extends AppCompatActivity implements TextWatcher{
         startActivity(backHome);
     }
 
-    /*
-    private void saveBaseData(){
-        Map<String, Object> map  = new HashMap<>();
-
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-
-        map.put("name", name);
-        map.put("mAvgRating", mAvgRating);
-        map.put("mNumRatings", mNumRatings);
-        map.put("fAvgRating", fAvgRating);
-        map.put("fNumRatings", fNumRatings);
-        map.put("lat",lat);
-        map.put("lon",lon);
-    }*/
-
     /**
      * onOptionsItemSelected
      *

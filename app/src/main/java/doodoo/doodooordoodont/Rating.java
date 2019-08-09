@@ -13,6 +13,7 @@ public class Rating {
     private Date date;
     private double rating;
     private String reviewer;
+    private String reviewerID;
     private String review;
     private int[] reactions;
 
@@ -24,9 +25,10 @@ public class Rating {
         this.UID = UID;
     }
 
-    public Rating(Date date, String user, double rating, String review){
+    public Rating(Date date, String user, String userID, double rating, String review){
         this.date = date;
         this.reviewer = user;
+        this.reviewerID = userID;
         this.rating = rating;
         this.review = review;
         reactions = new int[]{0,0,0};
@@ -42,7 +44,8 @@ public class Rating {
 
     public Rating(Map map){
         this.date = (Date) map.get("date");
-        this.reviewer = (String) map.get("user");
+        this.reviewer = (String) map.get("reviewer");
+        this.reviewerID = (String) map.get("reviewerID");
         this.rating =  (double) map.get("rating");
         this.review = (String) map.get("review");
         int useful = (int) ((long)map.get("useful"));
@@ -58,6 +61,7 @@ public class Rating {
         map.put("date", date);
         map.put("rating", rating);
         map.put("reviewer", reviewer);
+        map.put("reviewerID", reviewerID);
         map.put("review", review);
         map.put("useful", reactions[0]);
         map.put("funny", reactions[1]);

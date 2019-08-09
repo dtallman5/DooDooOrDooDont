@@ -163,7 +163,7 @@ public class RestroomPage extends AppCompatActivity
 
         // Sets the text for the number of ratings label
         TextView numRatings = findViewById(R.id.numReviews);
-        String reviewsLabel = Integer.toString(restroom.getmNumRatings()) + " Reviews";
+        String reviewsLabel = restroom.getmNumRatings() + " Reviews";
         numRatings.setText(reviewsLabel);
 
         //Initializes the drawer layout and its toggle
@@ -187,7 +187,7 @@ public class RestroomPage extends AppCompatActivity
         title.setText(restroom.getName());
 
         //Adds an onClickListener to the ratings button to display the ratings
-        Button ratingBtn = (Button) findViewById(R.id.ratingsButton);
+        Button ratingBtn = findViewById(R.id.ratingsButton);
         ratingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -196,7 +196,7 @@ public class RestroomPage extends AppCompatActivity
         });
 
         if (MainActivity.currUser != null){
-            Button addRating = (Button) findViewById(R.id.addRating);
+            Button addRating = findViewById(R.id.addRating);
             addRating.setVisibility(View.VISIBLE);
             addRating.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -225,7 +225,7 @@ public class RestroomPage extends AppCompatActivity
      * This method is used to display or hide the ratings for the restroom.
      */
     private void toggleReviews() {
-        final LinearLayout reviews = (LinearLayout) findViewById(R.id.reviews);
+        final LinearLayout reviews = findViewById(R.id.reviews);
         if (restroom.getmNumRatings() == 0){
             Toast alert = Toast.makeText(this,"No Reviews to Display",Toast.LENGTH_LONG);
             alert.show();
@@ -258,7 +258,7 @@ public class RestroomPage extends AppCompatActivity
                                 hidebtn.setId(hideID);
 
                                 //Changes the visibility of the rating button and the review layout
-                                Button btn = (Button) findViewById(R.id.ratingsButton);
+                                Button btn = findViewById(R.id.ratingsButton);
                                 btn.setVisibility(View.GONE);
                                 reviews.addView(hidebtn);
                                 reviews.setVisibility(View.VISIBLE);
@@ -271,8 +271,8 @@ public class RestroomPage extends AppCompatActivity
         }
         //If the reviews have already been downloaded it changes the visibility of the layout
         else{
-            Button btn = (Button) findViewById(R.id.ratingsButton);
-            Button hidebtn = (Button) findViewById(hideID);
+            Button btn = findViewById(R.id.ratingsButton);
+            Button hidebtn = findViewById(hideID);
             if (btn.getVisibility()!=View.GONE) {
                 btn.setVisibility(View.GONE);
                 reviews.setVisibility(View.VISIBLE);

@@ -31,28 +31,26 @@ import java.util.Date;
 
 
 /*
- * Created by David on 3/11/2018.
+ * Created by David on 8/8/2019.
  */
 
 /**
- * This class is used to create the Add Restroom activity that can be accessed by the drawer menu.
- * It contains the logic in order to check the fields on the page and then create a Restroom
- * object from the information provided. Should eventually add the restroom to the database
- * rather than putting it in an intent and sending back to main activity.
+ * This class is used to create the Add Rating activity that can be accessed by pressing
+ * the add Rating button when viewing a Restroom page while logged in. It has the logic to
+ * keep track of the fields to only let them press send when required info is filled out.
+ * It also has methods to update the associated restroom and user.
  */
 public class AddRating extends AppCompatActivity implements TextWatcher{
 
     private Button send;       //The button in the toolbar
-    private RadioGroup gender; //The Radio Group for bathroom gender
     private EditText review;     //The edit text field for the bathroom review
     private RatingBar ratings; //The rating bar
-    double lon, lat;           //Variables to hold the user's location when add restroom initiated
     private FirebaseFirestore db;
     private User user;
     private static final String TAG = "AddRating";
     private String rUID;
     private Rating toAdd;
-    Restroom toRate;
+    Restroom toRate; //Restroom being rated
 
 
     /**
@@ -71,6 +69,7 @@ public class AddRating extends AppCompatActivity implements TextWatcher{
         Intent from = getIntent();
         rUID = from.getStringExtra("restroomUID");
 
+        //Downloads the restroom data
         db = FirebaseFirestore.getInstance();
         DocumentReference docRef = db.collection("restrooms").document(rUID);
         docRef.get()
@@ -87,6 +86,7 @@ public class AddRating extends AppCompatActivity implements TextWatcher{
                     }
                 });
 
+        //Grabs the current user object
         user = MainActivity.currUser;
 
         //Sets the content view and initializes the toolbar
@@ -115,34 +115,6 @@ public class AddRating extends AppCompatActivity implements TextWatcher{
         review = findViewById(R.id.review);
         review.addTextChangedListener(this);
 
-        //Initializes the spinner for the number of stalls
-        Spinner stallSpinner = findViewById(R.id.stallSpinner);
-        String[] stallitems = {"0","1","2","3","4","5","6","7+"};
-        ArrayAdapter<String> stalladapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,stallitems);
-        stallSpinner.setAdapter(stalladapter);
-
-        //Initializes the spinner for which kind of hand drying mechanism the restroom has
-        Spinner dryerSpinner = findViewById(R.id.dryerSpinner);
-        String[] dryitems = {"Paper Towels","Air Dryers", "Both", "Other"};
-        ArrayAdapter<String> dryadapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,dryitems);
-        dryerSpinner.setAdapter(dryadapter);
-
-        //Adds an onClickListener to the showMore textView that will make the additionalInfo section
-        //appear or disappear depending on its state
-        TextView showMore = findViewById(R.id.showMore);
-        final LinearLayout additionalInfo = findViewById(R.id.addtnInfo);
-        showMore.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (additionalInfo.getVisibility() == View.GONE)
-                    additionalInfo.setVisibility(View.VISIBLE);
-                else if (additionalInfo.getVisibility() == View.VISIBLE)
-                    additionalInfo.setVisibility(View.GONE);
-            }
-        });
-
-
-
         //This adds the X button in the upper left that takes user back
         this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         this.getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close_white_24dp);
@@ -152,12 +124,14 @@ public class AddRating extends AppCompatActivity implements TextWatcher{
     /**
      * createRestroom
      *
-     * This method is called by the send button's onClickListener and creates the new Restroom.
+     * This method is called by the send button's onClickListener and creates the new Rating.
+     * It then attempts to add the rating to the database and then subsequently update the user
+     * and restroom in the database
      *
      */
     private void createRating() {
         //TODO need to make the restroom other data and restroom ratings be stored differently
-        toAdd = new Rating(new Date(), user.getUserId(),ratings.getRating(), review.getText().toString());
+        toAdd = new Rating(new Date(), user.getName(), user.getUserId(), ratings.getRating(), review.getText().toString());
         db.collection("reviews").document(rUID).collection("reviews")
                 .add(toAdd.toMap())
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -165,8 +139,8 @@ public class AddRating extends AppCompatActivity implements TextWatcher{
                     public void onSuccess(DocumentReference documentReference) {
                         Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
                         toAdd.setUID(documentReference.getId());
-                        addRatingtoRestroom();
-                        addRatingtoUser();
+                        addRatingtoRestroom(); //Calls to update restroom info
+                        addRatingtoUser(); //Calls to update user info
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -179,9 +153,18 @@ public class AddRating extends AppCompatActivity implements TextWatcher{
         startActivity(backHome);
     }
 
+    /**
+     * addRatingtoRestroom
+     *
+     * This method is after the rating has been added to the database and is used to handle
+     * updating the Restroom in the database with the new rating
+     *
+     */
     private void addRatingtoRestroom() {
         int numRatings;
         double avgRating;
+
+        //Checks gender of user and updates the corresponding ratings values
         if (user.getGender().equals("Male")) {
             numRatings = toRate.getmNumRatings();
             avgRating = toRate.getmAvgRating();
@@ -200,8 +183,18 @@ public class AddRating extends AppCompatActivity implements TextWatcher{
         }
     }
 
+    /**
+     * addRatingtoUser
+     *
+     * This method is after the rating has been added to the database and is used to handle
+     * updating the User in the database with the new rating
+     *
+     */
     private void addRatingtoUser() {
+        //Adds one to the number of reviews
         user.setNumReviews(user.getNumReviews() + 1);
+
+        //Creates a unique ratingID that can be parsed later
         String fullRatingID = toRate.getUID()+"_"+toAdd.getUID();
         db.collection("users").document(user.getUserId()).collection("reviews")
                 .document(fullRatingID).set(toAdd.toUserMap()).addOnSuccessListener(new OnSuccessListener() {
@@ -229,7 +222,8 @@ public class AddRating extends AppCompatActivity implements TextWatcher{
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == android.R.id.home){
-            super.onBackPressed();
+            Intent backHome = new Intent(this,MainActivity.class);
+            startActivity(backHome);
         }
 
         return super.onOptionsItemSelected(item);

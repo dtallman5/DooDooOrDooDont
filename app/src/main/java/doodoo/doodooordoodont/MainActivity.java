@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        currUser = null;
+        currUser = null; // Resets the currUser object
 
         //If there is no user at all, then it signs them in as an anonymous user
         if (user == null) {
@@ -169,7 +169,7 @@ public class MainActivity extends AppCompatActivity
         }
         //If the user is not anonymous, set the info to their info
         else {
-             //TODO Collects user info from the database
+             //Collects user info from the database
             db.collection("users").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {

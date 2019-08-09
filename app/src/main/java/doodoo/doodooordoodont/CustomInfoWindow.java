@@ -15,6 +15,8 @@ import com.google.android.gms.maps.model.Marker;
 /**
  * Created by David on 2/13/2018.
  *
+ * This is used to display a custom InfoWindow to allow it to display the restroom info.
+ *
  * Website for live info window
  * https://stackoverflow.com/questions/14123243/google-maps-android-api-v2-interactive-infowindow-like-in-original-android-go/15040761#15040761
  */
@@ -36,33 +38,36 @@ public class CustomInfoWindow implements GoogleMap.InfoWindowAdapter {
 
         Restroom rm = (Restroom) marker.getTag();
 
-        TabHost host = (TabHost) v.findViewById(R.id.tab_host);
+        TabHost host = v.findViewById(R.id.tab_host);
         host.setup();
 
+        //Creates Male Tab
         TabHost.TabSpec spec = host.newTabSpec("Male");
         spec.setContent(R.id.tab1);
-        RatingBar mAvg = (RatingBar) v.findViewById(R.id.maleAvg);
+        RatingBar mAvg = v.findViewById(R.id.maleAvg);
         mAvg.setRating((float)rm.getmAvgRating());
-        TextView mNum = (TextView) v.findViewById(R.id.maleNum);
+        TextView mNum = v.findViewById(R.id.maleNum);
         mNum.setText(Integer.toString(rm.getmNumRatings()));
-        TextView mName = (TextView) v.findViewById(R.id.maleName);
+        TextView mName = v.findViewById(R.id.maleName);
         mName.setText(rm.getName());
         spec.setIndicator("Male");
         host.addTab(spec);
 
+
+        //Creates Female Tab
         spec = host.newTabSpec("Female");
         spec.setContent(R.id.tab2);
-        TextView fAvg = (TextView) v.findViewById(R.id.femaleAvg);
+        TextView fAvg = v.findViewById(R.id.femaleAvg);
         fAvg.setText(Double.toString(rm.getfAvgRating()));
-        TextView fNum = (TextView) v.findViewById(R.id.femaleNum);
+        TextView fNum = v.findViewById(R.id.femaleNum);
         fNum.setText(Integer.toString(rm.getfNumRatings()));
-        TextView fName = (TextView) v.findViewById(R.id.femaleName);
+        TextView fName = v.findViewById(R.id.femaleName);
         fName.setText(rm.getName());
         spec.setIndicator("Female");
         host.addTab(spec);
 
 
-        if (rm.isMenDisplayed()){
+        if (Restroom.isMenDisplayed()){
             host.setCurrentTab(0);
         }
         else{
