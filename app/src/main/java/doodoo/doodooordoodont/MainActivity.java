@@ -17,6 +17,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -143,7 +144,7 @@ public class MainActivity extends AppCompatActivity
                                 // Sign in success, update UI with the signed-in user's information
                                 Log.d(TAG, "signInAnonymously:success");
                                 SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                                        .findFragmentById(R.id.map);
+                                        .findFragmentById(R.id.map_view);
                                 mapFragment.getMapAsync(MainActivity.this);
                             } else {
                                 // If sign in fails, display a message to the user.
@@ -187,7 +188,7 @@ public class MainActivity extends AppCompatActivity
 
         //Updates the map after changing the navigation header
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+                .findFragmentById(R.id.map_view);
         mapFragment.getMapAsync(MainActivity.this);
     }
 
@@ -271,6 +272,15 @@ public class MainActivity extends AppCompatActivity
                     });
             return true;
         }
+        else if (id == R.id.nav_list_view) {
+            drawer.closeDrawer(GravityCompat.START);
+            LinearLayoutCompat map_parent = findViewById(R.id.map_parent);
+            map_parent.setVisibility(View.INVISIBLE);
+        }
+        else if (id == R.id.nav_map_view) {
+            LinearLayoutCompat map_parent = findViewById(R.id.map_parent);
+            map_parent.setVisibility(View.VISIBLE);
+        }
         //If login is selected send the user to the login page
         else if (id == R.id.nav_login) {
             drawer.closeDrawer(GravityCompat.START);
@@ -283,6 +293,7 @@ public class MainActivity extends AppCompatActivity
             nextScreen = new Intent(this, MyAccount.class);
             startActivity(nextScreen);
         }
+        //
 
         //Closes the drawer
         drawer.closeDrawer(GravityCompat.START);
